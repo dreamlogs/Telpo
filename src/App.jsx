@@ -120,6 +120,31 @@ const SECTIONS = {
   ],
 };
 
+// ── Section to Lecture ID mapping (for completion tracking and section routing) ──
+const SECTION_LECTURES = {
+  // Chem sections -> lecture IDs in chem_placement.jsx
+  ch_atomic: ["a1","a2","a3","a4"], ch_naming: ["n1","n2","n3"], ch_reactions: ["r1","r2"],
+  ch_mole: ["m1","m2"], ch_phases: ["ph1","ph2"], ch_lewis: ["lw1","lw2"],
+  ch_gas: ["g1","g2"], ch_solutions: ["s1"], ch_equilibrium: ["eq1","eq2"],
+  ch_kinetics: ["kn1"], ch_review: ["x1","x2"],
+};
+const SECTION_TO_UNIT = {
+  ch_atomic:"u1", ch_naming:"u2", ch_reactions:"u3", ch_mole:"u4",
+  ch_phases:"u7", ch_lewis:"u8", ch_gas:"u5", ch_solutions:"u6",
+  ch_equilibrium:"u9", ch_kinetics:"u10", ch_review:"u11",
+};
+
+function getSectionCompletion(storageKey, sectionId) {
+  const lectureIds = SECTION_LECTURES[sectionId];
+  if (!lectureIds) return { done: 0, total: 0, complete: false };
+  try {
+    const raw = localStorage.getItem(storageKey);
+    const data = raw ? JSON.parse(raw) : {};
+    const done = lectureIds.filter(id => data[id] === "mastered").length;
+    return { done, total: lectureIds.length, complete: done === lectureIds.length };
+  } catch { return { done: 0, total: lectureIds.length, complete: false }; }
+}
+
 // ── Spaced repetition cards ──
 const REVIEW_CARDS = {
   calc: [
@@ -555,8 +580,12 @@ function ReviewQueue({ cards, onDismiss }) {
 }
 
 // ── Bubble Map Navigation ──
-function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEnterModule }) {
+function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, storageKey, onBack, onEnterModule, onEnterSection }) {
   const [activeId, setActiveId] = useState(null);
+  const [showReset, setShowReset] = useState(false);
+  const [resetCode, setResetCode] = useState("");
+  const [resetError, setResetError] = useState(false);
+  const [rf, setRf] = useState(0);
 
   const positions = useMemo(() => {
     const pos = {};
@@ -598,12 +627,44 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
         <p style={{ margin: 0, fontSize: "11px", fontFamily: MONO, color: C.textDim }}>
           {sections.length} SECTIONS // {sections.reduce((a, s) => a + s.count, 0)} LECTURES
         </p>
-        <button onClick={onEnterModule} style={{
-          marginLeft: "auto", padding: "6px 14px", borderRadius: "6px",
-          background: `${color}18`, border: `1px solid ${color}33`,
-          color: color, fontSize: "11px", fontWeight: 600, cursor: "pointer", fontFamily: MONO,
-        }}>OPEN ALL LECTURES \u2192</button>
+        <button onClick={() => setShowReset(true)} style={{
+          marginLeft: "auto", padding: "5px 12px", borderRadius: "6px",
+          background: `${C.red}15`, border: `1px solid ${C.red}33`,
+          color: C.red, fontSize: "10px", fontWeight: 600, cursor: "pointer", fontFamily: MONO,
+        }}>RESET ALL MODULES</button>
       </div>
+      {showReset && (
+        <div style={{ margin: "0 0 12px", padding: "14px", borderRadius: "8px", background: C.bgSurface, border: `1px solid ${C.red}33` }}>
+          <p style={{ fontSize: "12px", color: C.text, margin: "0 0 8px" }}>Enter passcode to reset all {moduleLabel} progress:</p>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input type="password" value={resetCode} onChange={e => { setResetCode(e.target.value); setResetError(false); }}
+              placeholder="Passcode" style={{
+                flex: 1, padding: "8px 12px", borderRadius: "6px", background: C.bgDeep,
+                border: `1px solid ${resetError ? C.red : C.border}`, color: C.text, fontSize: "13px",
+                fontFamily: MONO, outline: "none",
+              }} onKeyDown={e => { if (e.key === "Enter") {
+                if (resetCode === "0622") {
+                  try { localStorage.removeItem(storageKey); } catch {}
+                  setShowReset(false); setResetCode(""); setRf(r => r + 1);
+                } else { setResetError(true); }
+              }}} />
+            <button onClick={() => {
+              if (resetCode === "0622") {
+                try { localStorage.removeItem(storageKey); } catch {}
+                setShowReset(false); setResetCode(""); setRf(r => r + 1);
+              } else { setResetError(true); }
+            }} style={{
+              padding: "8px 16px", borderRadius: "6px", background: C.red, border: "none",
+              color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: SANS,
+            }}>Reset</button>
+            <button onClick={() => { setShowReset(false); setResetCode(""); setResetError(false); }} style={{
+              padding: "8px 12px", borderRadius: "6px", background: "transparent", border: `1px solid ${C.border}`,
+              color: C.textDim, fontSize: "12px", cursor: "pointer", fontFamily: SANS,
+            }}>Cancel</button>
+          </div>
+          {resetError && <p style={{ fontSize: "11px", color: C.red, margin: "6px 0 0" }}>Wrong passcode</p>}
+        </div>
+      )}
       <p style={{ margin: "0 0 16px", fontSize: "11px", color: C.textDim }}>
         Tap a section to see topics. Lines show prerequisite flow.
       </p>
@@ -640,19 +701,23 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
             const x = p.x * W, y = p.y * H, r = p.r;
             const isActive = activeId === s.id;
             const isRelated = relatedIds.has(s.id);
+            const sc = getSectionCompletion(storageKey, s.id);
+            const isComplete = sc.complete && sc.total > 0;
             const scale = isActive ? 1.15 : isRelated ? 1.05 : 1;
 
             return (
               <g key={s.id} onClick={() => setActiveId(prev => prev === s.id ? null : s.id)} style={{ cursor: "pointer" }}>
+                {/* Completed glow */}
+                {isComplete && <circle cx={x} cy={y} r={r + 8} fill={`${color}20`} style={{ animation: "pulseRing 3s ease-out infinite" }} />}
                 {/* Glow */}
                 {isActive && <circle cx={x} cy={y} r={r + 10} fill={glow} style={{ transition: "all 0.4s ease" }} />}
                 {/* Pulse */}
                 {isActive && <circle cx={x} cy={y} r={r + 16} fill="none" stroke={color} strokeWidth="0.5" opacity="0.2" style={{ animation: "pulseRing 2.5s ease-out infinite" }} />}
                 {/* Main circle */}
                 <circle cx={x} cy={y} r={r * scale}
-                  fill={isActive ? `${color}22` : isRelated ? `${color}11` : C.bgSurface}
-                  stroke={isActive ? color : isRelated ? `${color}55` : C.border}
-                  strokeWidth={isActive ? 1.5 : 1}
+                  fill={isComplete ? `${color}35` : isActive ? `${color}22` : isRelated ? `${color}11` : C.bgSurface}
+                  stroke={isComplete ? color : isActive ? color : isRelated ? `${color}55` : C.border}
+                  strokeWidth={isComplete ? 2 : isActive ? 1.5 : 1}
                   style={{ transition: "all 0.5s cubic-bezier(0.34,1.56,0.64,1)" }} />
                 {/* Inner ring */}
                 <circle cx={x} cy={y} r={r * scale - 5} fill="none" stroke={isActive ? color : C.border}
@@ -661,21 +726,27 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
                   {isActive && <animateTransform attributeName="transform" type="rotate" from={`0 ${x} ${y}`} to={`360 ${x} ${y}`} dur="15s" repeatCount="indefinite" />}
                 </circle>
                 {/* Label */}
-                <text x={x} y={y} textAnchor="middle" dominantBaseline="central"
-                  fill={isActive ? C.text : isRelated ? C.textMuted : C.textDim}
-                  fontSize="10" fontWeight={isActive ? "600" : "500"} fontFamily={SANS}
+                <text x={x} y={y - (isComplete ? 2 : 0)} textAnchor="middle" dominantBaseline="central"
+                  fill={isComplete ? color : isActive ? C.text : isRelated ? C.textMuted : C.textDim}
+                  fontSize="10" fontWeight={isComplete ? "700" : isActive ? "600" : "500"} fontFamily={SANS}
                   style={{ pointerEvents: "none", userSelect: "none", transition: "fill 0.3s ease" }}>
                   {s.short}
                 </text>
+                {/* Completion check */}
+                {isComplete && (
+                  <text x={x} y={y + 10} textAnchor="middle" fontSize="10" fill={color} style={{ pointerEvents: "none" }}>
+                    &#10003;
+                  </text>
+                )}
                 {/* Count badge */}
-                <text x={x} y={y + r * scale + 14} textAnchor="middle" fill={C.textDim}
+                <text x={x} y={y + r * scale + 14} textAnchor="middle" fill={isComplete ? color : C.textDim}
                   fontSize="9" fontFamily={MONO} style={{ pointerEvents: "none" }}>
-                  {s.count}L
+                  {sc.done}/{sc.total || s.count}L
                 </text>
                 {/* Go to lecture button inside bubble */}
                 {isActive && (
                   <foreignObject x={x - 50} y={y + r * scale + 20} width="100" height="28">
-                    <button onClick={(e) => { e.stopPropagation(); onEnterModule(); }} style={{
+                    <button onClick={(e) => { e.stopPropagation(); if (onEnterSection) onEnterSection(s.id); else onEnterModule(); }} style={{
                       width: "100%", padding: "4px 0", borderRadius: "6px", background: `${color}33`,
                       border: `1px solid ${color}55`, color: "#d4d2cb", fontSize: "10px", fontWeight: 600,
                       cursor: "pointer", fontFamily: SANS, backdropFilter: "blur(4px)",
@@ -689,17 +760,20 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
       </div>
 
       {/* Detail Card */}
-      {activeNode && (
+      {activeNode && (() => {
+        const sc = getSectionCompletion(storageKey, activeNode.id);
+        return (
         <div style={{
           margin: "12px 0", padding: "20px", borderRadius: "12px",
-          background: `${C.bgSurface}f0`, border: `1px solid ${color}33`,
+          background: `${C.bgSurface}f0`, border: `1px solid ${sc.complete && sc.total > 0 ? color : color + "33"}`,
           backdropFilter: "blur(12px)", animation: "panelIn 0.35s cubic-bezier(0.34,1.56,0.64,1)",
           boxShadow: `0 0 30px ${glow}`,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: color, boxShadow: `0 0 8px ${color}` }} />
             <span style={{ fontSize: "14px", fontWeight: 700, color: C.text }}>{activeNode.label}</span>
-            <span style={{ marginLeft: "auto", fontSize: "10px", fontFamily: MONO, color: C.textDim }}>{activeNode.lectures} // {activeNode.count} lectures</span>
+            {sc.complete && sc.total > 0 && <span style={{ fontSize: "10px", fontFamily: MONO, color, marginLeft: "4px" }}>COMPLETE</span>}
+            <span style={{ marginLeft: "auto", fontSize: "10px", fontFamily: MONO, color: C.textDim }}>{sc.done}/{sc.total} mastered</span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginBottom: "14px" }}>
             {activeNode.topics.map((t, i) => (
@@ -716,7 +790,8 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
             </p>
           )}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
@@ -835,6 +910,11 @@ export default function Telpo() {
   if (page === "calc") return darkWrap(<CalcLab onBack={goBack} />);
   if (page === "physics") return darkWrap(<PhysicsLab onBack={goBack} />);
   if (page === "chem") return darkWrap(<ChemPlacement onBack={goBack} />);
+  if (page.startsWith("chem:")) {
+    const sectionId = page.split(":")[1];
+    const unitId = SECTION_TO_UNIT[sectionId];
+    return darkWrap(<ChemPlacement onBack={goBack} startUnit={unitId} />);
+  }
   if (page === "cpp") return darkWrap(<CodingLab subject="cpp" onBack={goBack} />);
   if (page === "rust") return darkWrap(<CodingLab subject="rust" onBack={goBack} />);
 
@@ -857,7 +937,9 @@ export default function Telpo() {
         </svg>
         <div style={{ position: "relative", zIndex: 1, animation: "fadeIn 0.5s ease" }}>
           <BubbleMap moduleKey="calc" moduleLabel={sub.title} color={sub.color} glow={sub.glow}
-            sections={SECTIONS.calc} onBack={() => setPage("home")} onEnterModule={() => setPage("calc")} />
+            storageKey="Telpo-calc-v1"
+            sections={SECTIONS.calc} onBack={() => setPage("home")}
+            onEnterModule={() => setPage("calc")} />
         </div>
       </div>
     );
@@ -880,7 +962,9 @@ export default function Telpo() {
         </svg>
         <div style={{ position: "relative", zIndex: 1, animation: "fadeIn 0.5s ease" }}>
           <BubbleMap moduleKey="physics" moduleLabel={sub.title} color={sub.color} glow={sub.glow}
-            sections={SECTIONS.physics} onBack={() => setPage("home")} onEnterModule={() => setPage("physics")} />
+            storageKey="Telpo-physics-v1"
+            sections={SECTIONS.physics} onBack={() => setPage("home")}
+            onEnterModule={() => setPage("physics")} />
         </div>
       </div>
     );
@@ -903,7 +987,10 @@ export default function Telpo() {
         </svg>
         <div style={{ position: "relative", zIndex: 1, animation: "fadeIn 0.5s ease" }}>
           <BubbleMap moduleKey="chem" moduleLabel={sub.title} color={sub.color} glow={sub.glow}
-            sections={SECTIONS.chem} onBack={() => setPage("home")} onEnterModule={() => setPage("chem")} />
+            storageKey="Telpo-chemplace-v1"
+            sections={SECTIONS.chem} onBack={() => setPage("home")}
+            onEnterModule={() => setPage("chem")}
+            onEnterSection={(sectionId) => setPage(`chem:${sectionId}`)} />
         </div>
       </div>
     );

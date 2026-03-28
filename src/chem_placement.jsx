@@ -671,10 +671,10 @@ function LectureView({ lecture, status, onStatus, onBack }) {
   );
 }
 
-export default function ChemPlacement({ onBack }) {
+export default function ChemPlacement({ onBack, startUnit }) {
   const [progress, setProgress] = useState(loadProgress);
   const [activeLecture, setActiveLecture] = useState(null);
-  const [expandedUnit, setExpandedUnit] = useState(null);
+  const [expandedUnit, setExpandedUnit] = useState(startUnit || null);
   const updateStatus = useCallback((id,s) => { setProgress(prev => { const next={...prev,[id]:s}; saveProgress(next); return next; }); }, []);
   const masteredCount = Object.values(progress).filter(v=>v==="mastered").length;
 
@@ -705,12 +705,17 @@ export default function ChemPlacement({ onBack }) {
             <span style={{ fontFamily:F.mono, fontSize:10, color:C.textDim }}>{masteredCount}/{totalLectures}</span>
           </div>
         </div>
-        {UNITS.map(unit => {
+        {UNITS.map((unit, unitIdx) => {
           const um = unit.lectures.filter(l=>progress[l.id]==="mastered").length;
+          const unitComplete = um === unit.lectures.length;
           const isExp = expandedUnit===unit.id;
+          const isTarget = startUnit === unit.id;
+          const nextUnit = unitComplete ? UNITS[unitIdx + 1] : null;
+          // When startUnit is set, dim non-target units
+          const dimmed = startUnit && !isTarget;
           return (
-            <div key={unit.id} style={{ marginBottom:8 }}>
-              <div onClick={()=>setExpandedUnit(isExp?null:unit.id)} style={{ padding:"12px 14px", background:C.panel, borderRadius:isExp?"8px 8px 0 0":8, border:`1px solid ${C.border}`, cursor:"pointer" }} onMouseEnter={e=>e.currentTarget.style.borderColor=C.blue} onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
+            <div key={unit.id} style={{ marginBottom:8, opacity: dimmed ? 0.4 : 1, transition: "opacity 0.3s" }}>
+              <div onClick={()=>setExpandedUnit(isExp?null:unit.id)} style={{ padding:"12px 14px", background: unitComplete ? C.greenDim : C.panel, borderRadius:isExp?"8px 8px 0 0":8, border:`1px solid ${unitComplete ? C.green : C.border}`, cursor:"pointer" }} onMouseEnter={e=>{ if(!unitComplete) e.currentTarget.style.borderColor=C.blue; }} onMouseLeave={e=>{ if(!unitComplete) e.currentTarget.style.borderColor=C.border; }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <span style={{ fontSize:9, fontFamily:F.mono, color:C.textDim, background:C.blueDim, padding:"2px 6px", borderRadius:3 }}>W{unit.week}</span>
                   <div style={{ flex:1 }}>
@@ -718,7 +723,7 @@ export default function ChemPlacement({ onBack }) {
                     <div style={{ fontSize:11, color:C.textDim, marginTop:2 }}>{unit.desc}</div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontFamily:F.mono, fontSize:10, color:C.textDim }}>{um}/{unit.lectures.length}</div>
+                    <div style={{ fontFamily:F.mono, fontSize:10, color: unitComplete ? C.green : C.textDim }}>{unitComplete ? "\u2713 " : ""}{um}/{unit.lectures.length}</div>
                     <div style={{ width:50, height:2, background:C.border, borderRadius:1, marginTop:4, overflow:"hidden" }}>
                       <div style={{ height:"100%", width:`${(um/unit.lectures.length)*100}%`, background:C.green, transition:"width 0.3s" }} />
                     </div>
@@ -738,6 +743,20 @@ export default function ChemPlacement({ onBack }) {
                       </div>
                     );
                   })}
+                </div>
+              )}
+              {/* Section complete prompt */}
+              {unitComplete && isExp && (
+                <div style={{ padding:"12px 16px", background:C.greenDim, borderRadius:"0 0 8px 8px", border:`1px solid ${C.green}`, borderTop:"none", textAlign:"center" }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:C.green, margin:"0 0 6px" }}>Section complete!</p>
+                  {nextUnit ? (
+                    <button onClick={()=>setExpandedUnit(nextUnit.id)} style={{
+                      padding:"8px 20px", borderRadius:6, background:C.green, border:"none",
+                      color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:F.sans,
+                    }}>Move to: {nextUnit.title}</button>
+                  ) : (
+                    <p style={{ fontSize:12, color:C.green, margin:0 }}>All sections done. You are ready for the test.</p>
+                  )}
                 </div>
               )}
             </div>
