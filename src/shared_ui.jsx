@@ -1,42 +1,43 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // ════════════════════════════════════════════════════════════
-//  TELPO SHARED UI
-//  Slider, Practice, EquationExplorer
+//  TELPO SHARED UI — DARK COMFORT PALETTE
+//  Scientifically-grounded: no pure black/white (prevents halation),
+//  warm undertones, desaturated accents for sustained focus.
 // ════════════════════════════════════════════════════════════
 
 export const C = {
-  bg: "#ffffff",
-  panel: "#f8f9fb",
-  panelHover: "#f1f3f7",
-  border: "#e8eaef",
-  borderHover: "#d0d4dc",
-  graphBg: "#fcfcfd",
-  blue: "#4da3ff",
-  blueDim: "rgba(77,163,255,0.08)",
-  blueMid: "rgba(77,163,255,0.25)",
-  blueLight: "rgba(77,163,255,0.05)",
-  silver: "#9ca3af",
-  silverLight: "#c9cdd4",
-  text: "#1a1a2e",
-  textMid: "#5a5f72",
-  textDim: "#9298a8",
-  textLight: "#b4b9c6",
-  red: "#f87171",
-  redDim: "rgba(248,113,113,0.1)",
-  green: "#34d399",
-  greenDim: "rgba(52,211,153,0.1)",
-  gold: "#fbbf24",
-  goldDim: "rgba(251,191,36,0.08)",
-  grid: "#f0f1f5",
-  axis: "#d0d4dc",
-  done: "#34d399",
-  studying: "#fbbf24",
+  bg: "#141821",
+  panel: "#1c2030",
+  panelHover: "#242a3d",
+  border: "#262c3e",
+  borderHover: "#363e55",
+  graphBg: "#181c28",
+  blue: "#6a7fa8",
+  blueDim: "rgba(106,127,168,0.12)",
+  blueMid: "rgba(106,127,168,0.30)",
+  blueLight: "rgba(106,127,168,0.06)",
+  silver: "#6a6e7a",
+  silverLight: "#4a4e5a",
+  text: "#d4d2cb",
+  textMid: "#8a8b93",
+  textDim: "#5a5c66",
+  textLight: "#3e4250",
+  red: "#9a6666",
+  redDim: "rgba(154,102,102,0.15)",
+  green: "#5a7a5a",
+  greenDim: "rgba(90,122,90,0.15)",
+  gold: "#8a7a5b",
+  goldDim: "rgba(138,122,91,0.12)",
+  grid: "#1e2232",
+  axis: "#363e55",
+  done: "#5a7a5a",
+  studying: "#8a7a5b",
 };
 
 export const F = {
-  sans: "'Inter','SF Pro Display','Segoe UI',system-ui,sans-serif",
-  mono: "'SF Mono','Menlo','Monaco',monospace",
+  sans: "'IBM Plex Sans','Inter','SF Pro Display',system-ui,sans-serif",
+  mono: "'IBM Plex Mono','SF Mono','Menlo',monospace",
 };
 
 // ─── SLIDER WITH NUMBER INPUT ──────────────────────────────
@@ -146,9 +147,7 @@ export function CanvasGraph({ draw, width = 680, height = 380, onMouseMove, onMo
 // ─── ANSWER CHECKER ────────────────────────────────────────
 
 function extractKeyValues(answer) {
-  // Pull all numbers (including negatives, decimals, fractions)
   const nums = [];
-  // Match patterns like: 5, -3.14, 1/2, √25, 2π, etc.
   const numPattern = /-?\d+\.?\d*/g;
   let m;
   while ((m = numPattern.exec(answer)) !== null) {
@@ -172,33 +171,24 @@ export function checkAnswer(userInput, expectedAnswer) {
   const u = normalizeStr(userInput);
   const e = normalizeStr(expectedAnswer);
 
-  // Exact match after normalization
   if (u === e) return true;
 
-  // Check if expected answer contains key result indicators
-  // Look for patterns like "= 5", "= -3", "≈ 71.57"
   const resultPatterns = expectedAnswer.match(/[=≈]\s*(-?\d+\.?\d*)/g);
   if (resultPatterns && resultPatterns.length > 0) {
-    // Get the last result (usually the final answer)
     const lastResult = resultPatterns[resultPatterns.length - 1].replace(/[=≈]\s*/, "").trim();
     const lastNum = parseFloat(lastResult);
     const userNums = extractKeyValues(userInput);
-
-    // Check if user provided the key number
     if (userNums.some(n => Math.abs(n - lastNum) < 0.05)) return true;
   }
 
-  // Extract all numbers from expected and check overlap
   const expectedNums = extractKeyValues(expectedAnswer);
   const userNums = extractKeyValues(userInput);
 
   if (expectedNums.length > 0 && userNums.length > 0) {
-    // Check if the final/key number matches
     const keyNum = expectedNums[expectedNums.length - 1];
     if (userNums.some(n => Math.abs(n - keyNum) < 0.05)) return true;
   }
 
-  // Keyword matching for text answers
   const keywords = expectedAnswer
     .split(/[.,;:!?\n]/)
     .flatMap(s => s.split(" "))
@@ -216,10 +206,8 @@ export function checkAnswer(userInput, expectedAnswer) {
 // ─── STEP-BY-STEP BREAKDOWN ────────────────────────────────
 
 function parseSteps(answer) {
-  // Try to split the answer into logical steps
-  // Common patterns: numbered steps, arrow chains, comma separated operations
-  if (answer.includes("→")) {
-    return answer.split("→").map(s => s.trim()).filter(Boolean);
+  if (answer.includes("\u2192")) {
+    return answer.split("\u2192").map(s => s.trim()).filter(Boolean);
   }
   if (answer.includes(". ") && answer.split(". ").length > 1) {
     return answer.split(". ").map(s => s.trim()).filter(Boolean);
@@ -232,7 +220,6 @@ function parseSteps(answer) {
     }
     return steps;
   }
-  // Single step
   return [answer];
 }
 
@@ -240,7 +227,6 @@ function parseSteps(answer) {
 
 export function Practice({ questions }) {
   const [state, setState] = useState({});
-  // state[i] = { input: '', attempts: 0, status: 'active'|'retry'|'correct'|'failed'|'understood' }
 
   if (!questions || !questions.length) return null;
 
@@ -301,24 +287,20 @@ export function Practice({ questions }) {
             background: C.panel, borderRadius: 6, border: `1px solid ${s.status === "correct" ? C.green : s.status === "failed" ? C.red : s.status === "retry" ? C.gold : C.border}`,
             padding: "12px 14px", marginBottom: 6, transition: "border-color 0.2s",
           }}>
-            {/* Question */}
             <p style={{ color: C.text, fontFamily: F.sans, fontSize: 12, margin: 0, lineHeight: 1.6, fontWeight: 500 }}>{q.q}</p>
 
-            {/* Correct state */}
             {s.status === "correct" && (
               <div style={{ marginTop: 8, padding: "6px 10px", background: C.greenDim, borderRadius: 4 }}>
                 <p style={{ color: C.green, fontFamily: F.sans, fontSize: 11, margin: 0, fontWeight: 600 }}>Correct</p>
               </div>
             )}
 
-            {/* Understood state */}
             {s.status === "understood" && (
               <div style={{ marginTop: 8, padding: "6px 10px", background: C.greenDim, borderRadius: 4 }}>
                 <p style={{ color: C.green, fontFamily: F.sans, fontSize: 11, margin: 0 }}>Reviewed</p>
               </div>
             )}
 
-            {/* Active / Retry input */}
             {(s.status === "active" || s.status === "retry") && (
               <div style={{ marginTop: 8 }}>
                 {s.status === "retry" && (
@@ -353,21 +335,18 @@ export function Practice({ questions }) {
               </div>
             )}
 
-            {/* Failed state: step-by-step breakdown */}
             {s.status === "failed" && (
               <div style={{ marginTop: 8 }}>
                 <p style={{ color: C.red, fontFamily: F.sans, fontSize: 11, margin: "0 0 8px", fontWeight: 600 }}>
                   Here is the breakdown:
                 </p>
 
-                {/* Your answer vs correct */}
                 <div style={{ padding: "6px 10px", background: C.redDim, borderRadius: 4, marginBottom: 8 }}>
                   <p style={{ color: C.textMid, fontFamily: F.mono, fontSize: 11, margin: 0 }}>
                     Your answer: {s.input || "(empty)"}
                   </p>
                 </div>
 
-                {/* Step by step */}
                 <div style={{ padding: "10px 12px", background: C.bg, borderRadius: 4, border: `1px solid ${C.border}` }}>
                   <p style={{ fontFamily: F.sans, fontSize: 10, fontWeight: 600, color: C.textDim, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 6px" }}>
                     Step by step
@@ -387,7 +366,6 @@ export function Practice({ questions }) {
                   ))}
                 </div>
 
-                {/* I understand button */}
                 <button onClick={() => handleUnderstand(i)} style={{
                   marginTop: 10, background: C.blue, color: "#fff", border: "none", borderRadius: 4,
                   padding: "8px 18px", fontFamily: F.sans, fontSize: 12, cursor: "pointer", fontWeight: 600,
@@ -403,7 +381,6 @@ export function Practice({ questions }) {
 }
 
 // ─── EQUATION EXPLORER ─────────────────────────────────────
-// Interactive equation panel for each lecture
 
 export function EquationExplorer({ equations }) {
   if (!equations || !equations.length) return null;
@@ -419,7 +396,6 @@ export function EquationExplorer({ equations }) {
 }
 
 function EquationCard({ eq }) {
-  // eq = { label, params: [{name, min, max, step, init}], compute: (vals) => string, formula: string }
   const initVals = {};
   eq.params.forEach(p => { initVals[p.name] = p.init; });
   const [vals, setVals] = useState(initVals);
@@ -435,17 +411,15 @@ function EquationCard({ eq }) {
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }} onClick={() => setCollapsed(!collapsed)}>
         <p style={{ fontFamily: F.mono, fontSize: 13, color: C.text, margin: 0, fontWeight: 600 }}>{eq.formula}</p>
-        <span style={{ color: C.textLight, fontSize: 12, transform: collapsed ? "rotate(-90deg)" : "rotate(0)", transition: "transform 0.15s" }}>v</span>
+        <span style={{ color: C.textDim, fontSize: 12, transform: collapsed ? "rotate(-90deg)" : "rotate(0)", transition: "transform 0.15s" }}>v</span>
       </div>
 
       {!collapsed && (
         <div style={{ marginTop: 8 }}>
-          {/* Result */}
           <div style={{ padding: "6px 10px", background: C.blueDim, borderRadius: 4, marginBottom: 8 }}>
             <p style={{ fontFamily: F.mono, fontSize: 12, color: C.blue, margin: 0, fontWeight: 600 }}>{result}</p>
           </div>
 
-          {/* Parameter sliders */}
           <div style={{ display: "grid", gridTemplateColumns: eq.params.length > 2 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 8 }}>
             {eq.params.map(p => (
               <Slider key={p.name} label={p.name} value={vals[p.name]} min={p.min} max={p.max} step={p.step} onChange={v => setVal(p.name, v)} />
@@ -458,7 +432,6 @@ function EquationCard({ eq }) {
 }
 
 // ─── EQUATION DEFINITIONS ──────────────────────────────────
-// Map of vizType/lectureId to equation definitions
 
 export const CALC_EQUATIONS = {
   "0.1": [
@@ -501,200 +474,79 @@ export const CALC_EQUATIONS = {
   ],
   "0.2": [
     {
-      formula: "f(x) = ax^2 + bx + c",
-      params: [
-        { name: "a", min: -3, max: 3, step: 0.1, init: 1 },
-        { name: "b", min: -5, max: 5, step: 0.5, init: 0 },
-        { name: "c", min: -5, max: 5, step: 0.5, init: 0 },
-        { name: "x", min: -5, max: 5, step: 0.1, init: 2 },
-      ],
-      compute: ({ a, b, c, x }) => `f(${x}) = ${a}(${x})^2 + ${b}(${x}) + ${c} = ${(a * x * x + b * x + c).toFixed(2)}`,
-    },
-  ],
-  "0.3": [
-    {
-      formula: "y = A sin(Bx + C) + D",
-      params: [
-        { name: "A", min: -3, max: 3, step: 0.1, init: 1 },
-        { name: "B", min: 0.1, max: 4, step: 0.1, init: 1 },
-        { name: "x", min: -6, max: 6, step: 0.1, init: 1.57 },
-      ],
-      compute: ({ A, B, x }) => {
-        const period = (2 * Math.PI / B).toFixed(2);
-        return `y = ${A}sin(${B} * ${x.toFixed(2)}) = ${(A * Math.sin(B * x)).toFixed(4)}   period = ${period}`;
-      },
-    },
-    {
-      formula: "degrees to radians: rad = deg * pi/180",
-      params: [
-        { name: "deg", min: 0, max: 360, step: 1, init: 150 },
-      ],
-      compute: ({ deg }) => `${deg} * pi/180 = ${(deg * Math.PI / 180).toFixed(4)} rad = ${(deg / 180).toFixed(4)}pi`,
-    },
-  ],
-  "0.4": [
-    {
-      formula: "(f o g)(x) = f(g(x))",
-      params: [
-        { name: "x", min: -5, max: 5, step: 0.5, init: 2 },
-      ],
-      compute: ({ x }) => {
-        const gx = x + 1;
-        const fgx = gx * gx;
-        return `g(${x}) = ${x}+1 = ${gx},  f(g(${x})) = (${gx})^2 = ${fgx}`;
-      },
-    },
-  ],
-  "1.1": [
-    {
-      formula: "lim f(x) as x approaches a",
-      params: [
-        { name: "a", min: -3, max: 5, step: 1, init: 3 },
-      ],
-      compute: ({ a }) => {
-        // (x^2 - a^2) / (x - a) = x + a
-        return `lim (x^2 - ${a * a}) / (x - ${a}) = ${a} + ${a} = ${2 * a}`;
+      formula: "sin, cos, tan at angle theta",
+      params: [{ name: "theta", min: 0, max: 360, step: 5, init: 30 }],
+      compute: ({ theta }) => {
+        const r = theta * Math.PI / 180;
+        return `sin(${theta}) = ${Math.sin(r).toFixed(4)}, cos(${theta}) = ${Math.cos(r).toFixed(4)}, tan(${theta}) = ${Math.abs(Math.cos(r)) < 0.001 ? "undef" : Math.tan(r).toFixed(4)}`;
       },
     },
   ],
   "1.2": [
     {
-      formula: "lim [c * f(x)] = c * lim f(x)",
+      formula: "lim(x->a) f(x), f(x) = (x^2 - a^2)/(x - a)",
       params: [
-        { name: "c", min: -5, max: 5, step: 0.5, init: 3 },
-        { name: "L", min: -5, max: 5, step: 0.5, init: 4 },
+        { name: "a", min: -5, max: 5, step: 1, init: 3 },
+        { name: "h", min: -1, max: 1, step: 0.001, init: 0.01 },
       ],
-      compute: ({ c, L }) => `${c} * ${L} = ${(c * L).toFixed(1)}`,
+      compute: ({ a, h }) => {
+        const x = a + h;
+        const fx = (x * x - a * a) / (x - a);
+        return `f(${x.toFixed(4)}) = ${fx.toFixed(6)}, limit = ${(2 * a).toFixed(1)}`;
+      },
+    },
+  ],
+  "1.6": [
+    {
+      formula: "squeeze: g(x) <= f(x) <= h(x)",
+      params: [{ name: "x", min: -2, max: 2, step: 0.01, init: 0.1 }],
+      compute: ({ x }) => {
+        if (Math.abs(x) < 0.0001) return `At x=0: -|x|=0 <= x*sin(1/x)=0 <= |x|=0, limit = 0`;
+        const val = x * Math.sin(1 / x);
+        return `-|${x}| = ${(-Math.abs(x)).toFixed(4)} <= ${x}*sin(1/${x}) = ${val.toFixed(4)} <= |${x}| = ${Math.abs(x).toFixed(4)}`;
+      },
     },
   ],
   "2.1": [
     {
-      formula: "f'(x) = lim [f(x+h) - f(x)] / h",
+      formula: "f'(a) = lim(h->0) [f(a+h) - f(a)] / h",
       params: [
-        { name: "x", min: -3, max: 3, step: 0.1, init: 1 },
-        { name: "h", min: 0.001, max: 2, step: 0.001, init: 0.5 },
+        { name: "a", min: -3, max: 3, step: 0.5, init: 2 },
+        { name: "h", min: -1, max: 1, step: 0.001, init: 0.01 },
       ],
-      compute: ({ x, h }) => {
-        const fx = x * x;
-        const fxh = (x + h) * (x + h);
-        const sec = (fxh - fx) / h;
-        const deriv = 2 * x;
-        return `f(x)=x^2: secant = ${sec.toFixed(4)}, f'(${x}) = ${deriv.toFixed(1)}, error = ${Math.abs(sec - deriv).toFixed(5)}`;
+      compute: ({ a, h }) => {
+        const f = x => x * x;
+        const slope = (f(a + h) - f(a)) / h;
+        return `f(x)=x^2: [f(${a}+${h}) - f(${a})] / ${h} = ${slope.toFixed(4)}, exact f'(${a}) = ${(2 * a).toFixed(1)}`;
       },
-    },
-  ],
-  "2.2": [
-    {
-      formula: "d/dx [x^n] = n * x^(n-1)",
-      params: [
-        { name: "n", min: -3, max: 6, step: 1, init: 3 },
-        { name: "x", min: -3, max: 3, step: 0.1, init: 2 },
-      ],
-      compute: ({ n, x }) => `d/dx [x^${n}] at x=${x}: ${n} * ${x}^${n - 1} = ${(n * Math.pow(x, n - 1)).toFixed(3)}`,
     },
   ],
   "2.3": [
     {
-      formula: "(fg)' = f'g + fg'",
+      formula: "d/dx [x^n] = n*x^(n-1)",
       params: [
-        { name: "x", min: -3, max: 3, step: 0.1, init: 1 },
+        { name: "n", min: -3, max: 5, step: 1, init: 3 },
+        { name: "x", min: -3, max: 3, step: 0.1, init: 2 },
       ],
+      compute: ({ n, x }) => `d/dx [x^${n}] = ${n}*x^${n - 1} = ${n} * ${Math.pow(x, n - 1).toFixed(4)} = ${(n * Math.pow(x, n - 1)).toFixed(4)}`,
+    },
+  ],
+  "2.4": [
+    {
+      formula: "Product: (fg)' = f'g + fg'",
+      params: [{ name: "x", min: -3, max: 3, step: 0.1, init: 1 }],
       compute: ({ x }) => {
-        // f = x^2, g = sin(x)
-        const fp = 2 * x, g = Math.sin(x), f = x * x, gp = Math.cos(x);
-        return `f=x^2, g=sin(x): (fg)' = ${fp.toFixed(2)}*sin(${x.toFixed(1)}) + ${f.toFixed(2)}*cos(${x.toFixed(1)}) = ${(fp * g + f * gp).toFixed(4)}`;
+        const fg = x * x * Math.sin(x);
+        const deriv = 2 * x * Math.sin(x) + x * x * Math.cos(x);
+        return `f=x^2, g=sin(x): (fg)'(${x}) = 2(${x})sin(${x}) + (${x})^2*cos(${x}) = ${deriv.toFixed(4)}`;
       },
     },
   ],
-  "2.5": [
-    {
-      formula: "d/dx [sin(x)] = cos(x)",
-      params: [
-        { name: "x", min: -6, max: 6, step: 0.1, init: 0 },
-      ],
-      compute: ({ x }) => `sin'(${x.toFixed(1)}) = cos(${x.toFixed(1)}) = ${Math.cos(x).toFixed(4)}`,
-    },
-  ],
-  "2.6": [
-    {
-      formula: "d/dx [f(g(x))] = f'(g(x)) * g'(x)",
-      params: [
-        { name: "x", min: -3, max: 3, step: 0.1, init: 1 },
-        { name: "n", min: 2, max: 6, step: 1, init: 3 },
-      ],
-      compute: ({ x, n }) => {
-        // d/dx [(x^2+1)^n] = n(x^2+1)^(n-1) * 2x
-        const inner = x * x + 1;
-        const result = n * Math.pow(inner, n - 1) * 2 * x;
-        return `d/dx [(x^2+1)^${n}] = ${n}(${inner.toFixed(1)})^${n - 1} * ${(2 * x).toFixed(1)} = ${result.toFixed(3)}`;
-      },
-    },
-  ],
-  "2.7": [
-    {
-      formula: "x^2 + y^2 = r^2, dy/dx = -x/y",
-      params: [
-        { name: "r", min: 1, max: 10, step: 1, init: 5 },
-        { name: "x", min: -4, max: 4, step: 0.5, init: 3 },
-      ],
-      compute: ({ r, x }) => {
-        const y2 = r * r - x * x;
-        if (y2 <= 0) return `x=${x} is outside the circle r=${r}`;
-        const y = Math.sqrt(y2);
-        return `y = sqrt(${r * r} - ${x * x}) = ${y.toFixed(2)}, dy/dx = -${x}/${y.toFixed(2)} = ${(-x / y).toFixed(4)}`;
-      },
-    },
-  ],
-  "2.8": [
-    {
-      formula: "dA/dt = 2*pi*r*(dr/dt)",
-      params: [
-        { name: "r", min: 1, max: 20, step: 0.5, init: 5 },
-        { name: "drdt", min: 0.5, max: 5, step: 0.5, init: 2 },
-      ],
-      compute: ({ r, drdt }) => `dA/dt = 2pi(${r})(${drdt}) = ${(2 * Math.PI * r * drdt).toFixed(2)} cm^2/s`,
-    },
-  ],
-  "3.1": [
-    {
-      formula: "f(x) = x^3 - 3x, f'(x) = 3x^2 - 3",
-      params: [
-        { name: "x", min: -3, max: 3, step: 0.1, init: 0 },
-      ],
-      compute: ({ x }) => {
-        const fp = 3 * x * x - 3;
-        const fpp = 6 * x;
-        return `f'(${x.toFixed(1)}) = ${fp.toFixed(2)} (${fp > 0 ? "increasing" : fp < 0 ? "decreasing" : "critical"}), f''(${x.toFixed(1)}) = ${fpp.toFixed(2)} (${fpp > 0 ? "concave up" : fpp < 0 ? "concave down" : "inflection"})`;
-      },
-    },
-  ],
-  "3.5": [
-    {
-      formula: "lim (ax^2 + b) / (cx^2 + d) as x -> inf",
-      params: [
-        { name: "a", min: -5, max: 5, step: 1, init: 3 },
-        { name: "c", min: 1, max: 5, step: 1, init: 5 },
-      ],
-      compute: ({ a, c }) => `Leading coefficients: ${a}/${c} = ${(a / c).toFixed(4)}`,
-    },
-  ],
-  "3.7": [
-    {
-      formula: "A = x * y, perimeter = 2x + 2y = P",
-      params: [
-        { name: "P", min: 10, max: 100, step: 2, init: 40 },
-      ],
-      compute: ({ P }) => {
-        const x = P / 4;
-        return `Max area when x = y = P/4 = ${x}. A_max = ${(x * x).toFixed(1)}`;
-      },
-    },
-  ],
-  "4.1": [
+  "4.2": [
     {
       formula: "integral x^n dx = x^(n+1)/(n+1) + C",
       params: [
-        { name: "n", min: -2, max: 6, step: 1, init: 3 },
+        { name: "n", min: -3, max: 5, step: 1, init: 2 },
         { name: "x", min: -3, max: 3, step: 0.1, init: 2 },
       ],
       compute: ({ n, x }) => {
@@ -728,7 +580,6 @@ export const CALC_EQUATIONS = {
         { name: "b", min: 1, max: 5, step: 0.5, init: 3 },
       ],
       compute: ({ a, b }) => {
-        // integral x^2 from a to b = b^3/3 - a^3/3
         return `integral x^2 from ${a} to ${b}: ${b}^3/3 - ${a}^3/3 = ${(b ** 3 / 3 - a ** 3 / 3).toFixed(4)}`;
       },
     },
@@ -741,8 +592,6 @@ export const CALC_EQUATIONS = {
         { name: "b", min: 1, max: 4, step: 0.5, init: 2 },
       ],
       compute: ({ a, b }) => {
-        // f(x) = x+2, g(x) = x^2
-        // integral (x+2 - x^2) from a to b
         const F = x => x * x / 2 + 2 * x - x ** 3 / 3;
         return `f=x+2, g=x^2: Area = ${Math.abs(F(b) - F(a)).toFixed(4)}`;
       },
@@ -756,7 +605,6 @@ export const CALC_EQUATIONS = {
         { name: "b", min: 1, max: 4, step: 0.5, init: 2 },
       ],
       compute: ({ a, b }) => {
-        // f(x) = x, V = pi * integral x^2 from a to b = pi * (b^3 - a^3)/3
         return `f(x)=x: V = pi * (${b}^3 - ${a}^3)/3 = ${(Math.PI * (b ** 3 - a ** 3) / 3).toFixed(4)}`;
       },
     },
@@ -769,8 +617,6 @@ export const CALC_EQUATIONS = {
         { name: "b", min: 1, max: 4, step: 0.5, init: 2 },
       ],
       compute: ({ a, b }) => {
-        // f(x) = x^2, f'(x) = 2x
-        // numerical integration
         const n = 100;
         const dx = (b - a) / n;
         let sum = 0;

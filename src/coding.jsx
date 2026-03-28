@@ -107,7 +107,7 @@ const RUST_UNITS=[
 ];
 
 const CURRICULA = { cpp: CPP_UNITS, rust: RUST_UNITS };
-const KEYS = { cpp: "telpo-cpp-v1", rust: "telpo-rust-v1" };
+const KEYS = { cpp: "Telpo-cpp-v1", rust: "Telpo-rust-v1" };
 const TITLES = { cpp: "Arduino C++", rust: "Rust" };
 const DESCS = { cpp: "Embedded systems, sensors, actuators, and hardware programming.", rust: "Systems programming from ownership to concurrency." };
 
@@ -127,7 +127,7 @@ export default function CodingLab({subject,onBack}){
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
       <div style={{paddingTop:24}}>
         <button onClick={onBack} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>Back to Home</button>
-        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>telpo</p>
+        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>Telpo</p>
         <h1 style={{fontSize:24,fontWeight:600,color:C.text,margin:"0 0 6px"}}>{TITLES[subject]}</h1>
         <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>{DESCS[subject]}</p>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:28}}>
@@ -154,7 +154,7 @@ export default function CodingLab({subject,onBack}){
                 {l.code&&<span style={{fontSize:10,color:C.blue}}>code</span>}
               </div>
             </div>
-            <span style={{color:C.textLight,fontSize:13}}>></span>
+            <span style={{color:C.textLight,fontSize:13}}></span>
           </div>);})}
       </div>)}
       <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO {TITLES[subject].toUpperCase()} v1.1</p>

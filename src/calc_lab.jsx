@@ -5,7 +5,7 @@ import { C, F, Slider, Tip, CanvasGraph, Practice, EquationExplorer, CALC_EQUATI
 //  TELPO — Calculus Learning Platform
 // ════════════════════════════════════════════════════════════
 
-const STORAGE_KEY = "telpo-calc-v1";
+const STORAGE_KEY = "Telpo-calc-v1";
 function loadProgress() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : {}; } catch { return {}; } }
 function saveProgress(d) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {} }
 
@@ -351,7 +351,7 @@ export default function Telpo({onBack}){
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
       <div style={{paddingTop:40,marginBottom:32}}>
         {onBack && <button onClick={onBack} style={{background:"transparent",border:"none",color:"#9298a8",fontFamily:"'Inter',system-ui,sans-serif",fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>Back to Home</button>}
-        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>telpo</p>
+        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>Telpo</p>
         <h1 style={{fontSize:24,fontWeight:600,color:C.text,margin:"0 0 6px"}}>Calculus 1</h1>
         <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>32 lectures. Watch, interact, practice, master.</p>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -378,7 +378,7 @@ export default function Telpo({onBack}){
                 {l.questions?.length>0&&<span style={{fontSize:10,color:C.textLight}}>{l.questions.length}p</span>}
               </div>
             </div>
-            <span style={{color:C.textLight,fontSize:13}}>></span>
+            <span style={{color:C.textLight,fontSize:13}}></span>
           </div>);})}
       </div>)}
       <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO v1.1</p>

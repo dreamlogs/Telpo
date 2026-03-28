@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { C, F, Slider, Tip, CanvasGraph, Practice, EquationExplorer, PHYSICS_EQUATIONS } from "./shared_ui";
 
-const SK="telpo-physics-v1";
+const SK="Telpo-physics-v1";
 function load(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{};}catch{return{};}}
 function save(d){try{localStorage.setItem(SK,JSON.stringify(d));}catch{}}
 
@@ -477,7 +477,7 @@ export default function PhysicsLab({onBack}){
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
       <div style={{paddingTop:24}}>
         <button onClick={onBack} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>Back to Home</button>
-        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>telpo</p>
+        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>Telpo</p>
         <h1 style={{fontSize:24,fontWeight:600,color:C.text,margin:"0 0 6px"}}>Physics</h1>
         <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>15 units. Mechanics through quantum. Organic Chemistry Tutor + Professor Dave.</p>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:28}}>
@@ -504,7 +504,7 @@ export default function PhysicsLab({onBack}){
                 {l.questions?.length>0&&<span style={{fontSize:10,color:C.textLight}}>{l.questions.length}p</span>}
               </div>
             </div>
-            <span style={{color:C.textLight,fontSize:13}}>></span>
+            <span style={{color:C.textLight,fontSize:13}}></span>
           </div>);})}
       </div>)}
       <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO PHYSICS v1.1</p>

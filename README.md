@@ -1,16 +1,43 @@
-# React + Vite
+# Telpo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive learning platform for Calculus 1 and Physics. Vite + React, all visualizations rendered on HTML Canvas, no external UI dependencies.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Telpo structures self study around full lecture sequences with three layers of interaction per topic: manipulable graph visualizations, parametric equation explorers, and a typed answer system that provides step by step error correction on failed attempts.
 
-## React Compiler
+Progress tracking persists locally. The interface is intentionally minimal to reduce friction between opening the app and working through problems.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Modules
 
-## Expanding the ESLint configuration
+**Calculus 1** maps 32 Professor Leonard lectures (precalculus review through applications of integration) with 7 interactive visualizations covering lines, function transformations, trig, secant/tangent convergence, the limit definition of the derivative, Riemann sums, and concavity analysis. Equation explorers are defined for every lecture that introduces a computable formula.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Physics** maps 48 lectures across 15 units (vectors through nuclear physics) sourced from Organic Chemistry Tutor and Professor Dave. 9 interactive visualizations: vector addition with parallelogram rule, 1D kinematics, projectile motion, free body diagrams, energy conservation bar charts, simple harmonic motion, transverse waves, Coulomb's law, and series/parallel circuits.
+
+## Architecture
+
+```
+src/
+  App.jsx          Router, home screen, global progress aggregation
+  shared_ui.jsx    Slider (with inline numeric edit), Practice (typed answer engine),
+                   EquationExplorer, CanvasGraph, Tip, answer checking logic
+  calc_lab.jsx     Calculus curriculum, 7 Canvas visualizations, equation definitions
+  physics.jsx      Physics curriculum, 9 Canvas visualizations, equation definitions
+```
+
+All visualization state lives in React hooks. Canvas redraws on every parameter change via useCallback. Slider components accept both drag and direct numeric input. The Practice component implements a two attempt flow: incorrect on second try triggers a parsed step by step breakdown of the solution, gated behind an acknowledgment button before the question resolves.
+
+## Run
+
+```
+git clone https://github.com/0bzidion/Telpo.git
+cd Telpo
+npm install
+npm run dev
+```
+
+Serves at `localhost:5173`.
+
+## Author
+
+Adam Perez

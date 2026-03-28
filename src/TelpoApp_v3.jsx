@@ -22,11 +22,11 @@ const SANS = "'IBM Plex Sans','Inter',system-ui,sans-serif";
 
 // ── Subjects (keep existing storage keys) ──
 const SUBJECTS = [
-  { id: "calc", title: "Calculus I", desc: "32 lectures mapped to Professor Leonard", icon: "\u222B", lectures: 32, storageKey: "telpo-calc-v1", color: C.calculus, glow: C.calculusGlow },
-  { id: "physics", title: "Physics", desc: "15 units from mechanics to quantum", icon: "P", lectures: 48, storageKey: "telpo-physics-v1", color: C.physics, glow: C.physicsGlow },
-  { id: "chem", title: "Chem Placement", desc: "11 units to place into CHEM 1A by April 3", icon: "\u2697", lectures: 23, storageKey: "telpo-chemplace-v1", color: C.chem, glow: C.chemGlow },
-  { id: "cpp", title: "Arduino C++", desc: "Embedded systems and hardware programming", icon: "\u229E", lectures: 20, storageKey: "telpo-cpp-v1", color: C.code, glow: C.codeGlow },
-  { id: "rust", title: "Rust", desc: "Systems programming from zero", icon: "\u2699", lectures: 18, storageKey: "telpo-rust-v1", color: C.code, glow: C.codeGlow },
+  { id: "calc", title: "Calculus I", desc: "32 lectures mapped to Professor Leonard", icon: "\u222B", lectures: 32, storageKey: "Telpo-calc-v1", color: C.calculus, glow: C.calculusGlow },
+  { id: "physics", title: "Physics", desc: "15 units from mechanics to quantum", icon: "P", lectures: 48, storageKey: "Telpo-physics-v1", color: C.physics, glow: C.physicsGlow },
+  { id: "chem", title: "Chem Placement", desc: "5 week plan to place into CHEM 1A", icon: "\u2697", lectures: 16, storageKey: "Telpo-chemplace-v1", color: C.chem, glow: C.chemGlow },
+  { id: "cpp", title: "Arduino C++", desc: "Embedded systems and hardware programming", icon: "\u229E", lectures: 20, storageKey: "Telpo-cpp-v1", color: C.code, glow: C.codeGlow },
+  { id: "rust", title: "Rust", desc: "Systems programming from zero", icon: "\u2699", lectures: 18, storageKey: "Telpo-rust-v1", color: C.code, glow: C.codeGlow },
 ];
 
 // ── Progress helpers ──
@@ -41,7 +41,7 @@ function getProgress(key) {
 }
 
 // ── Gamification state (persisted) ──
-const GAME_KEY = "Telpo-game-v2";
+const GAME_KEY = "telpo-game-v2";
 function loadGame() {
   try {
     const raw = localStorage.getItem(GAME_KEY);
@@ -70,13 +70,8 @@ const BOSS_Q = {
   ],
   chem: [
     { q: "How many electrons in a neutral Carbon atom?", opts: ["6", "12", "4", "8"], ans: 0 },
+    { q: "pH of a neutral solution at 25\u00B0C:", opts: ["7", "0", "14", "1"], ans: 0 },
     { q: "In PV = nRT, R is the:", opts: ["Gas constant", "Resistance", "Rate", "Radius"], ans: 0 },
-    { q: "A substance releases heat when changing from:", opts: ["Liquid to solid", "Solid to gas", "Solid to liquid", "Liquid to gas"], ans: 0 },
-    { q: "Which does NOT obey the octet rule: N2, NO, CF4, Ar?", opts: ["NO", "N2", "CF4", "Ar"], ans: 0 },
-    { q: "Adding more reactant to equilibrium shifts it:", opts: ["Toward products", "Toward reactants", "No change", "Depends"], ans: 0 },
-    { q: "Higher temp increases rate because:", opts: ["More collisions exceed Ea", "Concentration goes up", "Volume expands", "Products increase"], ans: 0 },
-    { q: "What is log(10^-13)?", opts: ["-13", "13", "0.0013", "-10"], ans: 0 },
-    { q: "Molar mass of H2SO4 (H=1,S=32,O=16):", opts: ["98 g/mol", "82 g/mol", "64 g/mol", "114 g/mol"], ans: 0 },
   ],
 };
 
@@ -107,17 +102,11 @@ const SECTIONS = {
     { id: "ph_nuclear", label: "Nuclear Physics", short: "Nuclear", lectures: "Unit 15", count: 3, topics: ["Decay", "Half-life", "Reactions"], connections: [], prereqs: ["ph_waves"] },
   ],
   chem: [
-    { id: "ch_atomic", label: "Atomic Structure", short: "Atomic", lectures: "Unit 1", count: 4, topics: ["Subatomic Particles", "Electron Config", "Periodic Trends", "Bonding"], connections: ["ch_naming"], prereqs: [] },
-    { id: "ch_naming", label: "Nomenclature", short: "Naming", lectures: "Unit 2", count: 3, topics: ["Ionic Names", "Covalent Names", "Acid Names"], connections: ["ch_reactions"], prereqs: ["ch_atomic"] },
-    { id: "ch_reactions", label: "Reactions & Balancing", short: "React", lectures: "Unit 3", count: 2, topics: ["5 Reaction Types", "Balancing Equations"], connections: ["ch_mole"], prereqs: ["ch_naming"] },
-    { id: "ch_mole", label: "Mole & Stoichiometry", short: "Stoich", lectures: "Unit 4", count: 2, topics: ["Mole Conversions", "Limiting Reagent", "Percent Yield"], connections: ["ch_gas", "ch_phases"], prereqs: ["ch_reactions"] },
-    { id: "ch_gas", label: "Gas Laws", short: "Gas", lectures: "Unit 5", count: 2, topics: ["Boyle/Charles", "Ideal Gas Law", "Dalton's Law"], connections: ["ch_solutions"], prereqs: ["ch_mole"] },
-    { id: "ch_solutions", label: "Solutions", short: "Solns", lectures: "Unit 6", count: 1, topics: ["Molarity", "Dilution", "M1V1=M2V2"], connections: ["ch_equilibrium"], prereqs: ["ch_gas"] },
-    { id: "ch_phases", label: "States of Matter", short: "Phases", lectures: "Unit 7", count: 2, topics: ["Phase Changes", "Exo/Endothermic", "Heating Curves"], connections: ["ch_lewis"], prereqs: ["ch_mole"] },
-    { id: "ch_lewis", label: "Lewis Structures", short: "Lewis", lectures: "Unit 8", count: 2, topics: ["Dot Structures", "Octet Rule", "Exceptions"], connections: ["ch_equilibrium"], prereqs: ["ch_phases"] },
-    { id: "ch_equilibrium", label: "Equilibrium", short: "Equil", lectures: "Unit 9", count: 2, topics: ["Keq", "Le Chatelier's Principle"], connections: ["ch_kinetics"], prereqs: ["ch_solutions", "ch_lewis"] },
-    { id: "ch_kinetics", label: "Kinetics", short: "Kinetics", lectures: "Unit 10", count: 1, topics: ["Collision Theory", "Activation Energy", "Catalysts"], connections: ["ch_review"], prereqs: ["ch_equilibrium"] },
-    { id: "ch_review", label: "Math & Review", short: "Review", lectures: "Unit 11", count: 2, topics: ["Sci Notation", "Sig Figs", "Logarithms", "Full Review"], connections: [], prereqs: ["ch_kinetics"] },
+    { id: "ch_atomic", label: "Atomic Structure", short: "Atomic", lectures: "Module 1", count: 4, topics: ["Electron Config", "Quantum Numbers", "Periodic Trends"], connections: ["ch_bonding"], prereqs: [] },
+    { id: "ch_bonding", label: "Chemical Bonding", short: "Bonding", lectures: "Module 2", count: 3, topics: ["Lewis Structures", "VSEPR", "Hybridization"], connections: ["ch_reactions"], prereqs: ["ch_atomic"] },
+    { id: "ch_reactions", label: "Reactions & Stoich", short: "React", lectures: "Module 3", count: 4, topics: ["Balancing", "Moles", "Limiting Reagent"], connections: ["ch_solutions"], prereqs: ["ch_bonding"] },
+    { id: "ch_solutions", label: "Solutions & Acids", short: "Solns", lectures: "Module 4", count: 3, topics: ["Molarity", "pH/pOH", "Acid-Base"], connections: ["ch_gas"], prereqs: ["ch_reactions"] },
+    { id: "ch_gas", label: "Gas Laws", short: "Gas", lectures: "Module 5", count: 3, topics: ["Ideal Gas Law", "Dalton's Law", "KMT"], connections: [], prereqs: ["ch_solutions"] },
   ],
 };
 
@@ -140,11 +129,6 @@ const REVIEW_CARDS = {
     "What determines an element's chemical properties?",
     "How do you find the limiting reagent?",
     "What is molarity?",
-    "Name the 5 reaction types.",
-    "What does Le Chatelier's principle say?",
-    "Which molecules do NOT obey the octet rule?",
-    "What happens to temperature during a phase change?",
-    "log(10^n) = ?",
   ],
 };
 
@@ -218,6 +202,80 @@ function useAmbientSound() {
         }
         nodes.push(osc);
       });
+    } else if (m === "psy") {
+      // Generative weather-adaptive psytrance engine
+      const hour = new Date().getHours();
+      const isNight = hour >= 20 || hour < 6;
+      const isMorning = hour >= 6 && hour < 12;
+      const baseFreq = isNight ? 40 : isMorning ? 50 : 55;
+      const bpm = isNight ? 136 : isMorning ? 140 : 142;
+      const filterBase = isNight ? 200 : isMorning ? 300 : 400;
+      const filterRange = isNight ? 400 : isMorning ? 800 : 1200;
+      const padCutoff = isNight ? 250 : isMorning ? 400 : 600;
+      const rez = isNight ? 12 : isMorning ? 8 : 6;
+      master.gain.value = 0.08;
+      // Sub bass
+      const sub = ctx.createOscillator(); sub.type = "sine"; sub.frequency.value = baseFreq;
+      const subG = ctx.createGain(); subG.gain.value = 0.06;
+      sub.connect(subG); subG.connect(master); sub.start(); nodes.push(sub);
+      // Sub pump
+      const subPump = ctx.createOscillator(); subPump.type = "sine"; subPump.frequency.value = bpm / 60;
+      const subPumpG = ctx.createGain(); subPumpG.gain.value = 0.03;
+      subPump.connect(subPumpG); subPumpG.connect(subG.gain); subPump.start(); nodes.push(subPump);
+      // Acid bass
+      const acid = ctx.createOscillator(); acid.type = "sawtooth"; acid.frequency.value = baseFreq * 2;
+      const acidF = ctx.createBiquadFilter(); acidF.type = "lowpass"; acidF.frequency.value = filterBase; acidF.Q.value = rez;
+      const acidG = ctx.createGain(); acidG.gain.value = 0.035;
+      acid.connect(acidF); acidF.connect(acidG); acidG.connect(master); acid.start(); nodes.push(acid);
+      // Acid filter LFO (signature squelch)
+      const acidLfo = ctx.createOscillator(); acidLfo.type = "sine"; acidLfo.frequency.value = bpm / 60 / 4;
+      const acidLfoG = ctx.createGain(); acidLfoG.gain.value = filterRange;
+      acidLfo.connect(acidLfoG); acidLfoG.connect(acidF.frequency); acidLfo.start(); nodes.push(acidLfo);
+      // Meta-LFO: modulates sweep range over ~5 min cycles
+      const metaLfo = ctx.createOscillator(); metaLfo.type = "sine"; metaLfo.frequency.value = 0.003;
+      const metaLfoG = ctx.createGain(); metaLfoG.gain.value = filterRange * 0.5;
+      metaLfo.connect(metaLfoG); metaLfoG.connect(acidLfoG.gain); metaLfo.start(); nodes.push(metaLfo);
+      // Acid pump
+      const acidPump = ctx.createOscillator(); acidPump.type = "sine"; acidPump.frequency.value = bpm / 60;
+      const acidPumpG = ctx.createGain(); acidPumpG.gain.value = 0.015;
+      acidPump.connect(acidPumpG); acidPumpG.connect(acidG.gain); acidPump.start(); nodes.push(acidPump);
+      // Second acid voice (detuned width)
+      const acid2 = ctx.createOscillator(); acid2.type = "sawtooth"; acid2.frequency.value = baseFreq * 2 + 1.5;
+      const acid2F = ctx.createBiquadFilter(); acid2F.type = "lowpass"; acid2F.frequency.value = filterBase; acid2F.Q.value = rez - 2;
+      const acid2G = ctx.createGain(); acid2G.gain.value = 0.02;
+      acid2.connect(acid2F); acid2F.connect(acid2G); acid2G.connect(master); acid2.start(); nodes.push(acid2);
+      const acid2LfoG = ctx.createGain(); acid2LfoG.gain.value = filterRange * 0.8;
+      acidLfo.connect(acid2LfoG); acid2LfoG.connect(acid2F.frequency);
+      // Atmospheric pads
+      [baseFreq * 3, baseFreq * 4, baseFreq * 5, baseFreq * 6, baseFreq * 8].forEach((f, i) => {
+        const osc = ctx.createOscillator(); osc.type = i % 2 === 0 ? "sine" : "triangle";
+        osc.frequency.value = f + (Math.random() * 3 - 1.5);
+        const pf = ctx.createBiquadFilter(); pf.type = "lowpass"; pf.frequency.value = padCutoff;
+        const pg = ctx.createGain(); pg.gain.value = 0.012;
+        osc.connect(pf); pf.connect(pg); pg.connect(master); osc.start(); nodes.push(osc);
+        const plfo = ctx.createOscillator(); plfo.frequency.value = 0.03 + i * 0.015;
+        const plfoG = ctx.createGain(); plfoG.gain.value = 0.008;
+        plfo.connect(plfoG); plfoG.connect(pg.gain); plfo.start(); nodes.push(plfo);
+      });
+      // Hi-hat shimmer (filtered noise)
+      const nBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+      const nD = nBuf.getChannelData(0);
+      for (let j = 0; j < nD.length; j++) nD[j] = Math.random() * 2 - 1;
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = nBuf; nSrc.loop = true;
+      const nBp = ctx.createBiquadFilter(); nBp.type = "bandpass"; nBp.frequency.value = isNight ? 2000 : 4000; nBp.Q.value = 1.5;
+      const nG = ctx.createGain(); nG.gain.value = 0.006;
+      nSrc.connect(nBp); nBp.connect(nG); nG.connect(master); nSrc.start(); nodes.push(nSrc);
+      // 16th note gate on noise
+      const hatLfo = ctx.createOscillator(); hatLfo.type = "square"; hatLfo.frequency.value = bpm / 60 * 2;
+      const hatLfoG = ctx.createGain(); hatLfoG.gain.value = 0.004;
+      hatLfo.connect(hatLfoG); hatLfoG.connect(nG.gain); hatLfo.start(); nodes.push(hatLfo);
+      // Live weather adjustment
+      fetch("https://api.open-meteo.com/v1/forecast?latitude=33.79&longitude=-118.32&current_weather=true")
+        .then(r => r.json()).then(data => {
+          const wc = data?.current_weather?.weathercode || 0;
+          if (wc >= 51) { acidF.Q.value = 14; acid2F.Q.value = 12; nG.gain.value = 0.012; nBp.frequency.value = 1500; }
+          else if (wc >= 2) { acidF.Q.value = 10; nBp.frequency.value = 3000; }
+        }).catch(() => {});
     }
     nodesRef.current = nodes;
     setPlaying(true);
@@ -237,7 +295,7 @@ function PasswordScreen({ onUnlock }) {
   const [shake, setShake] = useState(false);
   const [dots, setDots] = useState([false, false, false, false]);
   const ref = useRef(null);
-  const PASSWORD = "0622";
+  const PASSWORD = "0831";
   useEffect(() => { ref.current?.focus(); }, []);
 
   const handleKey = (digit) => {
@@ -755,6 +813,7 @@ export default function Telpo() {
     { key: "drone", label: "Drone", icon: "\u25CE" },
     { key: "whitenoise", label: "White Noise", icon: "\u301C" },
     { key: "lofi", label: "Lo-fi", icon: "\u266B" },
+    { key: "psy", label: "Psytrance", icon: "\u2B29" },
   ];
 
   const xpForNext = game.level * 150;
@@ -1043,7 +1102,7 @@ export default function Telpo() {
         <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingBottom: "32px" }}>
           <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: C.green, boxShadow: `0 0 6px ${C.green}`, animation: "gridPulse 2s ease infinite" }} />
           <span style={{ fontSize: "10px", color: C.textDim, fontFamily: MONO }}>
-            TELPO v2.0 // {SUBJECTS.length} MODULES // {totalAll} LECTURES
+            Telpo v2.0 // {SUBJECTS.length} MODULES // {totalAll} LECTURES
           </span>
           {ambient.playing && <span style={{ fontSize: "10px", color: C.accent, fontFamily: MONO, marginLeft: "auto" }}>{"\u266B"} {ambient.mode.toUpperCase()}</span>}
         </div>
