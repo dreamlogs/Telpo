@@ -14,7 +14,7 @@ import { C, F, Slider, Practice, EquationExplorer, Tip } from "./shared_ui";
  *   - Practice with typed answers, 2 attempts, step-by-step breakdown
  */
 
-const STORAGE_KEY = "telpo-chemplace-v1";
+const STORAGE_KEY = "Telpo-chemplace-v1";
 const catColor = { metal: "#60a5fa", nonmetal: "#34d399", metalloid: "#fbbf24", noble: "#a78bfa" };
 
 /* ══════════════════════════════════════════════════════════════════
