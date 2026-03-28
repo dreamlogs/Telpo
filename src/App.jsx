@@ -672,6 +672,16 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
                   fontSize="9" fontFamily={MONO} style={{ pointerEvents: "none" }}>
                   {s.count}L
                 </text>
+                {/* Go to lecture button inside bubble */}
+                {isActive && (
+                  <foreignObject x={x - 50} y={y + r * scale + 20} width="100" height="28">
+                    <button onClick={(e) => { e.stopPropagation(); onEnterModule(); }} style={{
+                      width: "100%", padding: "4px 0", borderRadius: "6px", background: `${color}33`,
+                      border: `1px solid ${color}55`, color: "#d4d2cb", fontSize: "10px", fontWeight: 600,
+                      cursor: "pointer", fontFamily: SANS, backdropFilter: "blur(4px)",
+                    }}>Go to lecture</button>
+                  </foreignObject>
+                )}
               </g>
             );
           })}
@@ -701,14 +711,10 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, onBack, onEn
             ))}
           </div>
           {activeNode.prereqs.length > 0 && (
-            <p style={{ fontSize: "10px", fontFamily: MONO, color: C.textDim, margin: "0 0 10px" }}>
+            <p style={{ fontSize: "10px", fontFamily: MONO, color: C.textDim, margin: "0" }}>
               PREREQS: {activeNode.prereqs.map(p => sections.find(s => s.id === p)?.short || p).join(", ")}
             </p>
           )}
-          <button onClick={onEnterModule} style={{
-            padding: "8px 20px", borderRadius: "8px", background: `${color}22`, border: `1px solid ${color}44`,
-            color: C.text, fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: SANS,
-          }}>Open Lectures \u2192</button>
         </div>
       )}
     </div>
