@@ -30,7 +30,7 @@ All visualization state lives in React hooks. Canvas redraws on every parameter 
 ## Run
 
 ```
-git clone https://github.com/0bzidion/Telpo.git
+git clone https://github.com/dreamlogs/Telpo.git
 cd Telpo
 npm install
 npm run dev
