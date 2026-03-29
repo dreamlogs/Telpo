@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { C, F, Slider, Practice, EquationExplorer, Tip } from "./shared_ui";
+import PeriodicTable3D from "./periodic_table_3d";
 
 /*
  * Chemistry Placement Prep for Telpo
@@ -45,39 +46,7 @@ const PT = [
 ];
 
 function PeriodicExplorer() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ margin:"12px 0", borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}` }}>
-      <button onClick={() => setOpen(!open)} style={{
-        width:"100%", padding:"12px 16px", background:C.panel, border:"none", cursor:"pointer",
-        display:"flex", alignItems:"center", gap:8, fontFamily:F.sans,
-      }}>
-        <span style={{ fontSize:10, fontWeight:600, color:C.textDim, letterSpacing:1.5, textTransform:"uppercase" }}>
-          Interactive: 3D Periodic Table (Google)
-        </span>
-        <span style={{ marginLeft:"auto", fontSize:11, color:C.blue }}>{open ? "Hide" : "Open"}</span>
-      </button>
-      {open && (
-        <div style={{ position:"relative", width:"100%", height:500, background:"#0a0c12" }}>
-          <iframe
-            src="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=en"
-            style={{
-              position:"absolute", top:0, left:0, width:"100%", height:"100%", border:"none",
-              borderRadius:"0 0 8px 8px", filter:"brightness(0.85) contrast(1.1)",
-            }}
-            allow="accelerometer; gyroscope; webgl"
-            loading="lazy"
-          />
-          <a href="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=en" target="_blank" rel="noopener noreferrer"
-            style={{
-              position:"absolute", bottom:8, right:12, fontSize:10, color:C.blue,
-              textDecoration:"none", background:"rgba(10,12,18,0.8)", padding:"4px 10px", borderRadius:4,
-              zIndex:2,
-            }}>Open fullscreen in new tab</a>
-        </div>
-      )}
-    </div>
-  );
+  return <PeriodicTable3D />;
 }
 
 function ElectronShells() {
