@@ -540,7 +540,7 @@ export default function PhysicsLab({onBack}){
         {/* Interactive Equations */}
         <EquationExplorer equations={eqs} />
 
-        <Practice questions={l.questions}/>
+        <Practice questions={l.questions} storageId={l.id}/>
         <div style={{background:C.panel,borderRadius:4,border:`1px solid ${C.border}`,padding:"12px 14px",margin:"16px 0 40px"}}>
           <p style={{fontSize:10,fontWeight:600,color:C.textDim,letterSpacing:1,textTransform:"uppercase",margin:"0 0 4px"}}>Mastery check</p>
           <p style={{color:C.textMid,fontSize:11,margin:0,lineHeight:1.6}}>Explain the concept out loud without notes. If you can teach it, mark it mastered.</p>

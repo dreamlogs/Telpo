@@ -608,7 +608,7 @@ function LectureView({ lecture, status, onStatus, onBack }) {
         </div>
         {Interactive && <Interactive />}
         {eqs && <EquationExplorer equations={eqs} />}
-        <Practice questions={lecture.practice} />
+        <Practice questions={lecture.practice} storageId={lecture.id} />
         <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:14, marginTop:16, display:"flex", gap:8 }}>
           <button onClick={()=>onStatus("watched")} style={{ flex:1, padding:"10px 0", borderRadius:6, border:`1px solid ${status==="watched"?C.gold:C.border}`, background:status==="watched"?C.goldDim:C.panel, fontFamily:F.sans, fontSize:12, color:status==="watched"?C.gold:C.textDim, cursor:"pointer", fontWeight:500 }}>Mark Watched</button>
           <button onClick={()=>onStatus("mastered")} style={{ flex:1, padding:"10px 0", borderRadius:6, border:`1px solid ${status==="mastered"?C.green:C.border}`, background:status==="mastered"?C.greenDim:C.panel, fontFamily:F.sans, fontSize:12, color:status==="mastered"?C.green:C.textDim, cursor:"pointer", fontWeight:500 }}>Mark Mastered</button>

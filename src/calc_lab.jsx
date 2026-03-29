@@ -411,7 +411,7 @@ export default function Telpo({onBack}){
         <EquationExplorer equations={eqs} />
 
         {/* Typed answer practice */}
-        <Practice questions={l.questions}/>
+        <Practice questions={l.questions} storageId={l.id}/>
 
         <div style={{background:C.panel,borderRadius:4,border:`1px solid ${C.border}`,padding:"12px 14px",margin:"16px 0 40px"}}>
           <p style={{fontSize:10,fontWeight:600,color:C.textDim,letterSpacing:1,textTransform:"uppercase",margin:"0 0 4px"}}>Mastery check</p>

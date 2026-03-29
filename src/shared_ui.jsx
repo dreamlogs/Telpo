@@ -171,8 +171,23 @@ export function checkAnswer(userInput, expectedAnswer) {
   const u = normalizeStr(userInput);
   const e = normalizeStr(expectedAnswer);
 
+  // Exact match
   if (u === e) return true;
 
+  const userLower = userInput.trim().toLowerCase();
+  const expectedLower = expectedAnswer.toLowerCase();
+
+  // ── Extract core answer (before any explanation) ──
+  // Many answers are "Answer. Explanation" or "Answer = work"
+  // The core is usually before the first period or the part after the last =
+  const coreParts = expectedAnswer.split(/[.!]\s/);
+  const coreAnswer = coreParts[0].trim().toLowerCase();
+
+  // ── Check if user gave the core answer ──
+  const coreNorm = normalizeStr(coreAnswer);
+  if (coreNorm && u === coreNorm) return true;
+
+  // ── Number matching (existing, keep) ──
   const resultPatterns = expectedAnswer.match(/[=≈]\s*(-?\d+\.?\d*)/g);
   if (resultPatterns && resultPatterns.length > 0) {
     const lastResult = resultPatterns[resultPatterns.length - 1].replace(/[=≈]\s*/, "").trim();
@@ -183,24 +198,96 @@ export function checkAnswer(userInput, expectedAnswer) {
 
   const expectedNums = extractKeyValues(expectedAnswer);
   const userNums = extractKeyValues(userInput);
-
   if (expectedNums.length > 0 && userNums.length > 0) {
     const keyNum = expectedNums[expectedNums.length - 1];
     if (userNums.some(n => Math.abs(n - keyNum) < 0.05)) return true;
   }
 
+  // ── Entity extraction: element names, formulas, chemical terms ──
+  const elementNames = ["hydrogen","helium","lithium","beryllium","boron","carbon","nitrogen","oxygen","fluorine","neon","sodium","magnesium","aluminum","silicon","phosphorus","sulfur","chlorine","argon","potassium","calcium","scandium","titanium","vanadium","chromium","manganese","iron","cobalt","nickel","copper","zinc","gallium","germanium","arsenic","selenium","bromine","krypton"];
+  const formulaPattern = /[A-Z][a-z]?\d*(?:\([A-Z][a-z]?\d*\)\d*)*/g;
+  const expectedFormulas = (expectedAnswer.match(formulaPattern) || []).map(f => f.toLowerCase());
+  const userFormulas = (userInput.match(formulaPattern) || []).map(f => f.toLowerCase());
+
+  // Check if user's answer contains the key element name from expected
+  const expectedElements = elementNames.filter(el => expectedLower.includes(el));
+  const userElements = elementNames.filter(el => userLower.includes(el));
+  if (expectedElements.length > 0 && userElements.length > 0) {
+    // User named the right element(s)
+    const matchedElements = expectedElements.filter(el => userElements.includes(el));
+    if (matchedElements.length === expectedElements.length) return true;
+    // At least got the primary element (first mentioned)
+    if (matchedElements.length > 0 && matchedElements.includes(expectedElements[0])) return true;
+  }
+
+  // Check formula match
+  if (expectedFormulas.length > 0 && userFormulas.length > 0) {
+    const matchedFormulas = expectedFormulas.filter(f => userFormulas.includes(f));
+    if (matchedFormulas.length > 0) return true;
+  }
+
+  // ── Key concept matching ──
+  const conceptTerms = ["ionic","covalent","metal","nonmetal","metalloid","endothermic","exothermic",
+    "synthesis","decomposition","combustion","single","double","replacement","acid","base",
+    "oxidation","reduction","equilibrium","catalyst","cation","anion","proton","neutron","electron",
+    "mole","molarity","stoichiometry","limiting","excess","precipitate","soluble","insoluble",
+    "polar","nonpolar","tetrahedral","linear","bent","trigonal","octahedral",
+    "right","left","products","reactants","increases","decreases","no change","lower","higher"];
+
+  const expectedConcepts = conceptTerms.filter(t => expectedLower.includes(t));
+  const userConcepts = conceptTerms.filter(t => userLower.includes(t));
+  if (expectedConcepts.length > 0 && userConcepts.length > 0) {
+    const matchedConcepts = expectedConcepts.filter(c => userConcepts.includes(c));
+    if (matchedConcepts.length >= Math.ceil(expectedConcepts.length * 0.4)) return true;
+  }
+
+  // ── Relaxed keyword matching (existing but loosened) ──
   const keywords = expectedAnswer
-    .split(/[.,;:!?\n]/)
+    .split(/[.,;:!?\n()=]/)
     .flatMap(s => s.split(" "))
     .filter(w => w.length > 3)
-    .map(w => w.toLowerCase().replace(/[^a-z0-9]/g, ""));
+    .map(w => w.toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .filter(Boolean);
 
   if (keywords.length > 0) {
-    const matched = keywords.filter(k => u.includes(k));
-    if (matched.length >= Math.ceil(keywords.length * 0.5)) return true;
+    const matched = keywords.filter(k => userLower.replace(/[^a-z0-9\s]/g, "").includes(k));
+    // Lowered threshold from 50% to 30%
+    if (matched.length >= Math.ceil(keywords.length * 0.3)) return true;
   }
 
   return false;
+}
+
+// ── Generate hint from expected answer ──
+function getHint(expectedAnswer) {
+  // Give the user a nudge without giving the full answer
+  const parts = expectedAnswer.split(/[.]\s/);
+  const core = parts[0];
+
+  // If answer has a formula or number, hint at the type
+  const hasNumber = /\d/.test(core);
+  const hasFormula = /[A-Z][a-z]?\d/.test(core);
+  const hasElement = /[A-Z][a-z]/.test(core);
+
+  const words = core.split(/\s+/).filter(w => w.length > 2);
+  if (words.length <= 3) {
+    // Short answer - give format hint
+    return `The answer is short. Think: ${core.replace(/[A-Za-z]{3,}/g, (m) => m[0] + "___")}`;
+  }
+
+  // Give first word and structure
+  if (hasNumber && hasFormula) {
+    return `Include the number and formula. The answer starts with "${words[0]}..."`;
+  }
+  if (hasNumber) {
+    return `Include a number in your answer. Think about: ${words.slice(0, 2).join(" ")}...`;
+  }
+  if (hasElement || hasFormula) {
+    return `Name the element or formula. The answer involves: ${words[0]}...`;
+  }
+
+  // General hint: first 2 words
+  return `Think about: "${words.slice(0, 2).join(" ")}..." — include the key term and any numbers.`;
 }
 
 // ─── STEP-BY-STEP BREAKDOWN ────────────────────────────────
@@ -225,8 +312,19 @@ function parseSteps(answer) {
 
 // ─── PRACTICE COMPONENT (TYPED ANSWERS) ────────────────────
 
-export function Practice({ questions }) {
-  const [state, setState] = useState({});
+export function Practice({ questions, storageId }) {
+  // Persist practice state per lecture
+  const pKey = storageId ? `Telpo-practice-${storageId}` : null;
+  const [state, setState] = useState(() => {
+    if (!pKey) return {};
+    try { const r = localStorage.getItem(pKey); return r ? JSON.parse(r) : {}; } catch { return {}; }
+  });
+  const [hints, setHints] = useState({});
+
+  // Save on change
+  useEffect(() => {
+    if (pKey) try { localStorage.setItem(pKey, JSON.stringify(state)); } catch {}
+  }, [state, pKey]);
 
   if (!questions || !questions.length) return null;
 
@@ -243,10 +341,13 @@ export function Practice({ questions }) {
     const correct = checkAnswer(q.input, questions[i].a);
     if (correct) {
       updateQ(i, { status: "correct", attempts: q.attempts + 1 });
+      setHints(prev => { const n = { ...prev }; delete n[i]; return n; });
     } else if (q.attempts >= 1) {
       updateQ(i, { status: "failed", attempts: 2 });
+      setHints(prev => { const n = { ...prev }; delete n[i]; return n; });
     } else {
       updateQ(i, { status: "retry", attempts: 1 });
+      setHints(prev => ({ ...prev, [i]: getHint(questions[i].a) }));
     }
   };
 
@@ -261,7 +362,7 @@ export function Practice({ questions }) {
     updateQ(i, { status: "understood", input: "" });
   };
 
-  const resetAll = () => setState({});
+  const resetAll = () => { setState({}); setHints({}); if (pKey) try { localStorage.removeItem(pKey); } catch {} };
 
   return (
     <div style={{ marginTop: 16 }}>
@@ -304,9 +405,16 @@ export function Practice({ questions }) {
             {(s.status === "active" || s.status === "retry") && (
               <div style={{ marginTop: 8 }}>
                 {s.status === "retry" && (
-                  <p style={{ color: C.gold, fontFamily: F.sans, fontSize: 11, margin: "0 0 6px", fontWeight: 600 }}>
-                    Not quite. Try once more.
-                  </p>
+                  <div style={{ marginBottom: 6 }}>
+                    <p style={{ color: C.gold, fontFamily: F.sans, fontSize: 11, margin: "0 0 4px", fontWeight: 600 }}>
+                      Not quite. Try once more.
+                    </p>
+                    {hints[i] && (
+                      <p style={{ color: C.textMid, fontFamily: F.sans, fontSize: 11, margin: 0, padding: "4px 8px", background: C.goldDim, borderRadius: 4, lineHeight: 1.5 }}>
+                        Hint: {hints[i]}
+                      </p>
+                    )}
+                  </div>
                 )}
                 <div style={{ display: "flex", gap: 6 }}>
                   <input
