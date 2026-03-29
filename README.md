@@ -1,6 +1,6 @@
 # Telpo
 
-Interactive learning platform for Calculus 1 and Physics. Vite + React, all visualizations rendered on HTML Canvas, no external UI dependencies.
+Interactive self-learning platform for Calculus and Physics, Chemistry and Rust.
 
 ## Overview
 
