@@ -1,16 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { C, F } from "./shared_ui";
 
 /*
- * Custom 3D Periodic Table for Telpo
- * All 118 elements with descriptions
- * CSS 3D transforms: drag to rotate, scroll to zoom, click for details
- * Dark theme native, no external dependencies
+ * Custom 3D Periodic Table for Telpo v2
+ * All 118 elements, descriptions, 3D atom model
+ * Drag = rotate, Scroll = zoom, Shift+Drag = pan
+ * Click element = detail panel with animated atom render
  */
 
-// ── Element Data (all 118) ──
-// [Z, sym, name, mass, category, config, row, col, description]
-// category: 0=nonmetal 1=noble 2=alkali 3=alkaline 4=transition 5=post-trans 6=metalloid 7=halogen 8=lanthanide 9=actinide
+// ── Element Data: [Z, sym, name, mass, cat, config, row, col, desc] ──
+// cat: 0=nonmetal 1=noble 2=alkali 3=alkaline 4=transition 5=post-trans 6=metalloid 7=halogen 8=lanthanide 9=actinide
 const EL = [
 [1,"H","Hydrogen",1.008,0,"1s1",1,1,"Lightest element. Makes up 75% of all normal matter by mass. Fuel for stars."],
 [2,"He","Helium",4.003,1,"1s2",1,18,"Second lightest. Inert noble gas used in balloons and cryogenics. Formed by nuclear fusion in stars."],
@@ -135,32 +134,163 @@ const EL = [
 const CAT_NAMES = ["Nonmetal","Noble gas","Alkali metal","Alkaline earth","Transition metal","Post-transition","Metalloid","Halogen","Lanthanide","Actinide"];
 const CAT_COLORS = ["#34d399","#a78bfa","#f87171","#fb923c","#60a5fa","#6ee7b7","#fbbf24","#f472b6","#818cf8","#c084fc"];
 
+// ── Compute electron shells for any Z ──
+function getShells(z) {
+  const maxPerShell = [2,8,18,32,32,18,8]; // simplified
+  const shells = []; let rem = z;
+  for (let i = 0; i < 7 && rem > 0; i++) {
+    const c = Math.min(rem, maxPerShell[i]);
+    shells.push(c); rem -= c;
+  }
+  return shells;
+}
+
+// ── Animated 3D Atom Model (CSS only) ──
+function AtomModel({ z, sym, color, electrons }) {
+  const eCount = electrons !== undefined ? electrons : z;
+  const shells = getShells(eCount);
+  const protons = z;
+  const neutrons = Math.round(EL.find(e => e[0] === z)?.[3] || z) - z;
+  const nucleusSize = Math.min(22, 10 + Math.sqrt(protons + neutrons) * 1.8);
+  const charge = protons - eCount;
+  const chargeLabel = charge === 0 ? "" : charge > 0 ? `${charge}+` : `${Math.abs(charge)}\u2212`;
+
+  return (
+    <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto" }}>
+      <style>{`
+        @keyframes orbit1 { from { transform: rotateZ(0deg) } to { transform: rotateZ(360deg) } }
+        @keyframes orbit2 { from { transform: rotateY(0deg) rotateX(60deg) rotateZ(0deg) } to { transform: rotateY(0deg) rotateX(60deg) rotateZ(360deg) } }
+        @keyframes orbit3 { from { transform: rotateY(90deg) rotateX(30deg) rotateZ(0deg) } to { transform: rotateY(90deg) rotateX(30deg) rotateZ(360deg) } }
+        @keyframes orbit4 { from { transform: rotateX(90deg) rotateZ(0deg) } to { transform: rotateX(90deg) rotateZ(360deg) } }
+        @keyframes orbit5 { from { transform: rotateY(45deg) rotateX(75deg) rotateZ(0deg) } to { transform: rotateY(45deg) rotateX(75deg) rotateZ(360deg) } }
+        @keyframes orbit6 { from { transform: rotateY(135deg) rotateX(45deg) rotateZ(0deg) } to { transform: rotateY(135deg) rotateX(45deg) rotateZ(360deg) } }
+        @keyframes orbit7 { from { transform: rotateY(60deg) rotateX(15deg) rotateZ(0deg) } to { transform: rotateY(60deg) rotateX(15deg) rotateZ(360deg) } }
+        @keyframes nucleusPulse { 0%,100% { box-shadow: 0 0 12px ${color}88; } 50% { box-shadow: 0 0 24px ${color}cc; } }
+        @keyframes atomFadeIn { from { opacity:0; transform:scale(0.6) } to { opacity:1; transform:scale(1) } }
+      `}</style>
+      <div style={{ position: "absolute", inset: 0, animation: "atomFadeIn 0.5s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        {/* Nucleus */}
+        <div style={{
+          position: "absolute", left: "50%", top: "50%",
+          transform: "translate(-50%,-50%)", width: nucleusSize, height: nucleusSize,
+          borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${color}, ${color}55)`,
+          animation: "nucleusPulse 2s ease-in-out infinite",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: Math.min(11, nucleusSize * 0.5), fontWeight: 800, color: "#fff",
+          zIndex: 5,
+        }}>{sym}</div>
+        {/* Charge badge */}
+        {charge !== 0 && (
+          <div style={{
+            position: "absolute", left: "50%", top: "50%",
+            transform: `translate(${nucleusSize * 0.5}px, ${-nucleusSize * 0.5}px)`,
+            fontSize: 10, fontWeight: 700, fontFamily: F.mono,
+            color: charge > 0 ? "#f87171" : "#60a5fa",
+            textShadow: "0 0 6px rgba(0,0,0,0.8)",
+            zIndex: 6,
+          }}>{chargeLabel}</div>
+        )}
+
+        {/* Electron shells */}
+        {shells.map((count, si) => {
+          const r = 28 + si * 16;
+          const dur = 3 + si * 1.2;
+          const animName = `orbit${si + 1}`;
+          return (
+            <div key={si} style={{
+              position: "absolute", left: "50%", top: "50%",
+              width: r * 2, height: r * 2,
+              transform: "translate(-50%,-50%)",
+            }}>
+              {/* Orbit ring */}
+              <div style={{
+                position: "absolute", inset: 0, borderRadius: "50%",
+                border: `1px solid ${color}22`,
+              }} />
+              {/* Rotating electron container */}
+              <div style={{
+                position: "absolute", inset: 0,
+                animation: `${animName} ${dur}s linear infinite`,
+              }}>
+                {Array.from({ length: Math.min(count, 8) }).map((_, ei) => {
+                  // Distribute electrons evenly on the ring
+                  const angle = (ei / Math.min(count, 8)) * 360;
+                  return (
+                    <div key={ei} style={{
+                      position: "absolute", left: "50%", top: "50%",
+                      width: 6, height: 6, borderRadius: "50%",
+                      background: color,
+                      boxShadow: `0 0 6px ${color}aa`,
+                      transform: `rotate(${angle}deg) translateX(${r}px) translate(-50%,-50%)`,
+                    }} />
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* Shell count labels */}
+      <div style={{ position: "absolute", left: 0, bottom: -4, width: "100%", textAlign: "center" }}>
+        <span style={{ fontSize: 9, fontFamily: F.mono, color: `${color}99` }}>
+          {shells.map((c) => `${c}`).join(" . ")} = {eCount}e-
+          {charge !== 0 && <span style={{ color: charge > 0 ? "#f87171" : "#60a5fa", marginLeft: 4 }}>({chargeLabel} ion)</span>}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ──
 export default function PeriodicTable3D() {
   const containerRef = useRef(null);
-  const [rotX, setRotX] = useState(12);
+  const [rotX, setRotX] = useState(8);
   const [rotY, setRotY] = useState(0);
-  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [zoom, setZoom] = useState(0.85);
   const [dragging, setDragging] = useState(false);
+  const [panning, setPanning] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const [selected, setSelected] = useState(null);
+  const [electronCount, setElectronCount] = useState(null);
 
+  // Reset electrons when selecting new element
+  const selectElement = useCallback((z) => {
+    if (z === selected) { setSelected(null); setElectronCount(null); }
+    else { setSelected(z); setElectronCount(z); }
+  }, [selected]);
+
+  // Drag = rotate, Shift+Drag = pan
   const onPointerDown = useCallback((e) => {
-    if (e.target.closest(".el-cell")) return;
-    setDragging(true);
+    if (e.target.closest && e.target.closest(".el-cell")) return;
+    if (e.shiftKey || e.button === 1) {
+      setPanning(true);
+    } else {
+      setDragging(true);
+    }
     lastPos.current = { x: e.clientX, y: e.clientY };
   }, []);
+
   const onPointerMove = useCallback((e) => {
-    if (!dragging) return;
+    if (!dragging && !panning) return;
     const dx = e.clientX - lastPos.current.x;
     const dy = e.clientY - lastPos.current.y;
-    setRotY(r => r + dx * 0.3);
-    setRotX(r => Math.max(-60, Math.min(60, r - dy * 0.3)));
+    if (panning) {
+      setPanX(p => p + dx);
+      setPanY(p => p + dy);
+    } else {
+      setRotY(r => r + dx * 0.3);
+      setRotX(r => Math.max(-60, Math.min(60, r - dy * 0.3)));
+    }
     lastPos.current = { x: e.clientX, y: e.clientY };
-  }, [dragging]);
-  const onPointerUp = useCallback(() => setDragging(false), []);
+  }, [dragging, panning]);
+
+  const onPointerUp = useCallback(() => { setDragging(false); setPanning(false); }, []);
+
   const onWheel = useCallback((e) => {
     e.preventDefault();
-    setZoom(z => Math.max(0.4, Math.min(2.2, z - e.deltaY * 0.001)));
+    setZoom(z => Math.max(0.3, Math.min(2.5, z - e.deltaY * 0.001)));
   }, []);
 
   useEffect(() => {
@@ -170,33 +300,52 @@ export default function PeriodicTable3D() {
     return () => el.removeEventListener("wheel", onWheel);
   }, [onWheel]);
 
-  const sel = selected !== null ? EL.find(e => e[0] === selected) : null;
+  // Click outside to deselect
+  const onBgClick = useCallback((e) => {
+    if (!e.target.closest(".el-cell") && !e.target.closest(".detail-panel")) {
+      setSelected(null); setElectronCount(null);
+    }
+  }, []);
 
-  // Cell size
-  const cw = 52, ch = 58, gap = 3;
+  const sel = selected !== null ? EL.find(e => e[0] === selected) : null;
+  const cw = 50, ch = 56, gap = 3;
 
   return (
     <div style={{ margin: "12px 0" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
         <p style={{ fontSize: 10, fontWeight: 600, color: C.textDim, letterSpacing: 1.5, textTransform: "uppercase", margin: 0 }}>
-          Interactive: 3D Periodic Table (all 118 elements)
+          Interactive: 3D Periodic Table
         </p>
-        <span style={{ fontSize: 9, color: C.textDim, fontFamily: F.mono }}>Drag to rotate / Scroll to zoom</span>
+        <span style={{ fontSize: 9, color: C.textDim, fontFamily: F.mono }}>Drag=rotate / Shift+Drag=pan / Scroll=zoom</span>
+      </div>
+
+      {/* Reset view button */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+        <button onClick={() => { setRotX(8); setRotY(0); setPanX(0); setPanY(0); setZoom(0.85); }} style={{
+          padding: "3px 10px", borderRadius: 4, background: "transparent", border: `1px solid ${C.border}`,
+          color: C.textDim, fontSize: 10, cursor: "pointer", fontFamily: F.mono,
+        }}>Reset view</button>
+        <button onClick={() => { setRotX(0); setRotY(0); }} style={{
+          padding: "3px 10px", borderRadius: 4, background: "transparent", border: `1px solid ${C.border}`,
+          color: C.textDim, fontSize: 10, cursor: "pointer", fontFamily: F.mono,
+        }}>Flat view</button>
       </div>
 
       {/* 3D Container */}
-      <div ref={containerRef}
+      <div ref={containerRef} onClick={onBgClick}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}
         style={{
-          width: "100%", height: 520, perspective: 1800, cursor: dragging ? "grabbing" : "grab",
+          width: "100%", height: 520, perspective: 1800,
+          cursor: dragging ? "grabbing" : panning ? "move" : "grab",
           overflow: "hidden", borderRadius: 10, background: "rgba(10,12,18,0.6)",
           border: `1px solid ${C.border}`, position: "relative",
         }}>
         <div style={{
           width: 18 * (cw + gap), height: 10 * (ch + gap) + 40,
-          position: "absolute", left: "50%", top: "50%",
+          position: "absolute", left: `calc(50% + ${panX}px)`, top: `calc(50% + ${panY}px)`,
           transform: `translate(-50%,-50%) scale(${zoom}) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-          transformStyle: "preserve-3d", transition: dragging ? "none" : "transform 0.1s ease-out",
+          transformStyle: "preserve-3d",
+          transition: dragging || panning ? "none" : "transform 0.15s ease-out",
         }}>
           {EL.map(el => {
             const [z, sym, name, mass, cat, cfg, row, col, desc] = el;
@@ -206,29 +355,29 @@ export default function PeriodicTable3D() {
             const color = CAT_COLORS[cat];
             return (
               <div key={z} className="el-cell"
-                onClick={(e) => { e.stopPropagation(); setSelected(isSel ? null : z); }}
+                onClick={(e) => { e.stopPropagation(); selectElement(z); }}
                 style={{
                   position: "absolute", left: x, top: y, width: cw, height: ch,
                   borderRadius: 4, cursor: "pointer",
                   background: isSel ? `${color}44` : `${color}11`,
                   border: `1px solid ${isSel ? color : `${color}33`}`,
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  transition: "all 0.2s ease",
-                  transform: isSel ? "translateZ(20px) scale(1.15)" : "translateZ(0)",
-                  boxShadow: isSel ? `0 0 20px ${color}44` : "none",
+                  transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                  transform: isSel ? "translateZ(24px) scale(1.18)" : "translateZ(0) scale(1)",
+                  boxShadow: isSel ? `0 0 24px ${color}55, 0 4px 16px rgba(0,0,0,0.4)` : "none",
                   transformStyle: "preserve-3d",
                   zIndex: isSel ? 10 : 1,
                 }}>
                 <span style={{ fontSize: 7, color: `${color}99`, fontFamily: F.mono, lineHeight: 1 }}>{z}</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: isSel ? "#fff" : color, lineHeight: 1.2 }}>{sym}</span>
-                <span style={{ fontSize: 6, color: `${color}77`, lineHeight: 1, marginTop: 1, maxWidth: cw - 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-                <span style={{ fontSize: 6, color: `${color}55`, fontFamily: F.mono, lineHeight: 1 }}>{mass}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: isSel ? "#fff" : color, lineHeight: 1.2 }}>{sym}</span>
+                <span style={{ fontSize: 5.5, color: `${color}77`, lineHeight: 1, marginTop: 1, maxWidth: cw - 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                <span style={{ fontSize: 5.5, color: `${color}55`, fontFamily: F.mono, lineHeight: 1 }}>{mass}</span>
               </div>
             );
           })}
           {/* Lanthanide/Actinide labels */}
-          <div style={{ position: "absolute", left: 0, top: 8 * (ch + gap) + 16, fontSize: 8, color: CAT_COLORS[8], fontFamily: F.mono }}>57-71 Lanthanides</div>
-          <div style={{ position: "absolute", left: 0, top: 9 * (ch + gap) + 16, fontSize: 8, color: CAT_COLORS[9], fontFamily: F.mono }}>89-103 Actinides</div>
+          <div style={{ position: "absolute", left: 2*(cw+gap) - 40, top: 8 * (ch + gap) + 18, fontSize: 8, color: CAT_COLORS[8], fontFamily: F.mono }}>57-71</div>
+          <div style={{ position: "absolute", left: 2*(cw+gap) - 40, top: 9 * (ch + gap) + 18, fontSize: 8, color: CAT_COLORS[9], fontFamily: F.mono }}>89-103</div>
         </div>
       </div>
 
@@ -242,36 +391,108 @@ export default function PeriodicTable3D() {
         ))}
       </div>
 
-      {/* Element Detail Panel */}
+      {/* ── Element Detail Panel with Atom Model ── */}
       {sel && (
-        <div style={{
-          marginTop: 12, padding: 16, borderRadius: 8,
-          background: `${CAT_COLORS[sel[4]]}08`,
-          border: `1px solid ${CAT_COLORS[sel[4]]}33`,
+        <div className="detail-panel" style={{
+          marginTop: 14, padding: 20, borderRadius: 10,
+          background: `rgba(10,12,18,0.85)`,
+          border: `1px solid ${CAT_COLORS[sel[4]]}44`,
+          backdropFilter: "blur(8px)",
+          animation: "atomFadeIn 0.35s cubic-bezier(0.34,1.56,0.64,1)",
         }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
-            <span style={{ fontSize: 32, fontWeight: 800, color: CAT_COLORS[sel[4]] }}>{sel[1]}</span>
-            <div>
-              <span style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{sel[2]}</span>
-              <span style={{ fontSize: 11, color: C.textDim, marginLeft: 8 }}>{CAT_NAMES[sel[4]]}</span>
+          <style>{`@keyframes atomFadeIn { from { opacity:0; transform:scale(0.92) translateY(8px) } to { opacity:1; transform:scale(1) translateY(0) } }`}</style>
+
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            {/* Atom model */}
+            <div style={{ flex: "0 0 200px" }}>
+              <AtomModel z={sel[0]} sym={sel[1]} color={CAT_COLORS[sel[4]]} electrons={electronCount} />
             </div>
-            <button onClick={() => setSelected(null)} style={{
-              marginLeft: "auto", background: "none", border: "none", color: C.textDim,
-              fontSize: 16, cursor: "pointer", padding: 4,
-            }}>{"\u2715"}</button>
+
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+                <span style={{ fontSize: 32, fontWeight: 800, color: CAT_COLORS[sel[4]] }}>{sel[1]}</span>
+                <div>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{sel[2]}</span>
+                  <span style={{ fontSize: 11, color: C.textDim, marginLeft: 8 }}>{CAT_NAMES[sel[4]]}</span>
+                </div>
+                <button onClick={() => setSelected(null)} style={{
+                  marginLeft: "auto", background: "none", border: "none", color: C.textDim,
+                  fontSize: 16, cursor: "pointer", padding: 4,
+                }}>{"\u2715"}</button>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px 16px", fontSize: 12, color: C.textMid, marginBottom: 10 }}>
+                <span>Atomic #: <b style={{ color: C.text }}>{sel[0]}</b></span>
+                <span>Mass: <b style={{ color: C.text }}>{sel[3]}</b> amu</span>
+                <span>Protons: <b style={{ color: C.text }}>{sel[0]}</b></span>
+                <span>Neutrons: <b style={{ color: C.text }}>{Math.round(sel[3]) - sel[0]}</b></span>
+                <span>Electrons: <b style={{ color: electronCount !== sel[0] ? (electronCount < sel[0] ? "#f87171" : "#60a5fa") : C.text }}>{electronCount}</b></span>
+                <span>Shells: <b style={{ color: CAT_COLORS[sel[4]] }}>{getShells(electronCount).length}</b></span>
+              </div>
+
+              {/* Electron slider */}
+              <div style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 6, background: "rgba(255,255,255,0.03)", border: `1px solid ${C.border}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: C.textDim }}>Electrons</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {electronCount !== sel[0] && (() => {
+                      const ch = sel[0] - electronCount;
+                      const label = ch > 0 ? `${sel[1]}${ch > 1 ? ch : ""}\u207A` : `${sel[1]}${Math.abs(ch) > 1 ? Math.abs(ch) : ""}\u207B`;
+                      return (
+                        <span style={{
+                          fontSize: 12, fontWeight: 700, fontFamily: F.mono,
+                          color: ch > 0 ? "#f87171" : "#60a5fa",
+                          padding: "2px 8px", borderRadius: 4,
+                          background: ch > 0 ? "rgba(248,113,113,0.12)" : "rgba(96,165,250,0.12)",
+                        }}>
+                          {label} {ch > 0 ? "cation" : "anion"}
+                        </span>
+                      );
+                    })()}
+                    {electronCount !== sel[0] && (
+                      <button onClick={() => setElectronCount(sel[0])} style={{
+                        fontSize: 9, color: C.textDim, background: "transparent",
+                        border: `1px solid ${C.border}`, borderRadius: 3,
+                        padding: "2px 6px", cursor: "pointer", fontFamily: F.mono,
+                      }}>Reset</button>
+                    )}
+                    <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 700, color: C.text, minWidth: 20, textAlign: "right" }}>{electronCount}</span>
+                  </div>
+                </div>
+                <input type="range" min={Math.max(0, sel[0] - 4)} max={sel[0] + 4} step={1} value={electronCount}
+                  onChange={e => setElectronCount(parseInt(e.target.value))}
+                  style={{ width: "100%", accentColor: CAT_COLORS[sel[4]], height: 3, cursor: "pointer" }} />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: C.textDim, marginTop: 2 }}>
+                  <span>Lose e\u207B (cation +)</span>
+                  <span style={{ color: electronCount === sel[0] ? CAT_COLORS[sel[4]] : C.textDim, fontWeight: electronCount === sel[0] ? 600 : 400 }}>Neutral</span>
+                  <span>Gain e\u207B (anion \u2212)</span>
+                </div>
+              </div>
+
+              <div style={{
+                fontSize: 11, fontFamily: F.mono, color: "#6a7fa8",
+                marginBottom: 10, padding: "6px 10px",
+                background: "rgba(106,127,168,0.08)", borderRadius: 4,
+              }}>
+                {sel[5]}
+              </div>
+
+              <p style={{ fontSize: 13, color: C.textMid, lineHeight: 1.7, margin: 0 }}>{sel[8]}</p>
+
+              {/* Shell breakdown */}
+              <div style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {getShells(electronCount).map((c, i) => (
+                  <div key={i} style={{
+                    padding: "3px 8px", borderRadius: 4,
+                    background: `${CAT_COLORS[sel[4]]}15`,
+                    border: `1px solid ${CAT_COLORS[sel[4]]}25`,
+                    fontSize: 10, fontFamily: F.mono, color: CAT_COLORS[sel[4]],
+                  }}>Shell {i + 1}: {c}e-</div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px 16px", fontSize: 12, color: C.textMid, marginBottom: 10 }}>
-            <span>Atomic #: <b style={{ color: C.text }}>{sel[0]}</b></span>
-            <span>Mass: <b style={{ color: C.text }}>{sel[3]}</b> amu</span>
-            <span>Protons: <b style={{ color: C.text }}>{sel[0]}</b></span>
-            <span>Electrons: <b style={{ color: C.text }}>{sel[0]}</b></span>
-            <span>Neutrons: <b style={{ color: C.text }}>{Math.round(sel[3]) - sel[0]}</b></span>
-            <span>Group: <b style={{ color: CAT_COLORS[sel[4]] }}>{sel[7]}</b></span>
-          </div>
-          <div style={{ fontSize: 11, fontFamily: F.mono, color: C.blue, marginBottom: 10, padding: "6px 10px", background: `${C.blue}11`, borderRadius: 4 }}>
-            {sel[5]}
-          </div>
-          <p style={{ fontSize: 13, color: C.textMid, lineHeight: 1.7, margin: 0 }}>{sel[8]}</p>
         </div>
       )}
     </div>
