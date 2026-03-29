@@ -45,59 +45,37 @@ const PT = [
 ];
 
 function PeriodicExplorer() {
-  const [sel, setSel] = useState(null);
-  const rows = [1,2,3,4].map(p => PT.filter(e => e.p === p));
-  const el = sel !== null ? PT.find(e => e.n === sel) : null;
+  const [open, setOpen] = useState(false);
   return (
-    <div style={{ margin:"12px 0", padding:16, background:C.panel, borderRadius:8, border:`1px solid ${C.border}` }}>
-      <p style={{ fontSize:10, fontWeight:600, color:C.textDim, letterSpacing:1.5, textTransform:"uppercase", margin:"0 0 10px" }}>Interactive: Periodic Table (first 20)</p>
-      <div style={{ display:"flex", flexDirection:"column", gap:3, marginBottom:12 }}>
-        {rows.map((row,ri) => (
-          <div key={ri} style={{ display:"flex", gap:3, flexWrap:"wrap" }}>
-            {row.map(e => {
-              const on = sel === e.n;
-              return (
-                <div key={e.n} onClick={() => setSel(on ? null : e.n)} style={{
-                  width:34, height:34, borderRadius:4, display:"flex", flexDirection:"column",
-                  alignItems:"center", justifyContent:"center", cursor:"pointer",
-                  background: on ? catColor[e.cat] : `${catColor[e.cat]}22`,
-                  border: `1.5px solid ${on ? catColor[e.cat] : "transparent"}`,
-                  marginLeft: (e.p===1&&e.g===18)||(e.p>=2&&e.p<=3&&e.g===13&&row.length<8) ? "auto" : 0,
-                  transition:"all 0.15s",
-                }}>
-                  <span style={{ fontSize:7, color:on?"#fff":C.textDim, fontFamily:F.mono }}>{e.n}</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:on?"#fff":C.text }}>{e.sym}</span>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-      <div style={{ display:"flex", gap:12, marginBottom:10, flexWrap:"wrap" }}>
-        {Object.entries(catColor).map(([k,v]) => (
-          <div key={k} style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <div style={{ width:8, height:8, borderRadius:2, background:v }} />
-            <span style={{ fontSize:10, color:C.textDim, textTransform:"capitalize" }}>{k==="noble"?"noble gas":k}</span>
-          </div>
-        ))}
-      </div>
-      {el ? (
-        <div style={{ padding:12, background:C.bg, borderRadius:6, border:`1px solid ${C.border}` }}>
-          <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:6 }}>
-            <span style={{ fontSize:22, fontWeight:700, color:catColor[el.cat] }}>{el.sym}</span>
-            <span style={{ fontSize:14, fontWeight:500, color:C.text }}>{el.name}</span>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4px 16px", fontSize:12, color:C.textMid }}>
-            <span>Atomic #: <b style={{ color:C.text }}>{el.n}</b></span>
-            <span>Mass: <b style={{ color:C.text }}>{el.mass}</b> amu</span>
-            <span>Protons: <b style={{ color:C.text }}>{el.n}</b></span>
-            <span>Neutrons: <b style={{ color:C.text }}>{Math.round(el.mass)-el.n}</b></span>
-            <span>Electrons: <b style={{ color:C.text }}>{el.n}</b></span>
-            <span>Valence e-: <b style={{ color:C.green }}>{el.ve}</b></span>
-            <span style={{ gridColumn:"1/-1" }}>Config: <b style={{ color:C.blue, fontFamily:F.mono }}>{el.cfg}</b></span>
-          </div>
+    <div style={{ margin:"12px 0", borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}` }}>
+      <button onClick={() => setOpen(!open)} style={{
+        width:"100%", padding:"12px 16px", background:C.panel, border:"none", cursor:"pointer",
+        display:"flex", alignItems:"center", gap:8, fontFamily:F.sans,
+      }}>
+        <span style={{ fontSize:10, fontWeight:600, color:C.textDim, letterSpacing:1.5, textTransform:"uppercase" }}>
+          Interactive: 3D Periodic Table (Google)
+        </span>
+        <span style={{ marginLeft:"auto", fontSize:11, color:C.blue }}>{open ? "Hide" : "Open"}</span>
+      </button>
+      {open && (
+        <div style={{ position:"relative", width:"100%", height:500, background:"#0a0c12" }}>
+          <iframe
+            src="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=en"
+            style={{
+              position:"absolute", top:0, left:0, width:"100%", height:"100%", border:"none",
+              borderRadius:"0 0 8px 8px", filter:"brightness(0.85) contrast(1.1)",
+            }}
+            allow="accelerometer; gyroscope; webgl"
+            loading="lazy"
+          />
+          <a href="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=en" target="_blank" rel="noopener noreferrer"
+            style={{
+              position:"absolute", bottom:8, right:12, fontSize:10, color:C.blue,
+              textDecoration:"none", background:"rgba(10,12,18,0.8)", padding:"4px 10px", borderRadius:4,
+              zIndex:2,
+            }}>Open fullscreen in new tab</a>
         </div>
-      ) : <p style={{ fontSize:11, color:C.textDim, textAlign:"center", margin:0 }}>Tap an element to explore</p>}
+      )}
     </div>
   );
 }
