@@ -16,42 +16,16 @@ import PeriodicTable3D from "./periodic_table_3d";
  */
 
 const STORAGE_KEY = "Telpo-chemplace-v1";
-const catColor = { metal: "#60a5fa", nonmetal: "#34d399", metalloid: "#fbbf24", noble: "#a78bfa" };
 
 /* ══════════════════════════════════════════════════════════════════
    INTERACTIVE DIAGRAMS
    ══════════════════════════════════════════════════════════════════ */
 
-const PT = [
-  { sym:"H",n:1,name:"Hydrogen",mass:1.008,cat:"nonmetal",g:1,p:1,cfg:"1s\u00b9",ve:1 },
-  { sym:"He",n:2,name:"Helium",mass:4.003,cat:"noble",g:18,p:1,cfg:"1s\u00b2",ve:2 },
-  { sym:"Li",n:3,name:"Lithium",mass:6.941,cat:"metal",g:1,p:2,cfg:"[He] 2s\u00b9",ve:1 },
-  { sym:"Be",n:4,name:"Beryllium",mass:9.012,cat:"metal",g:2,p:2,cfg:"[He] 2s\u00b2",ve:2 },
-  { sym:"B",n:5,name:"Boron",mass:10.81,cat:"metalloid",g:13,p:2,cfg:"[He] 2s\u00b2 2p\u00b9",ve:3 },
-  { sym:"C",n:6,name:"Carbon",mass:12.01,cat:"nonmetal",g:14,p:2,cfg:"[He] 2s\u00b2 2p\u00b2",ve:4 },
-  { sym:"N",n:7,name:"Nitrogen",mass:14.01,cat:"nonmetal",g:15,p:2,cfg:"[He] 2s\u00b2 2p\u00b3",ve:5 },
-  { sym:"O",n:8,name:"Oxygen",mass:16.00,cat:"nonmetal",g:16,p:2,cfg:"[He] 2s\u00b2 2p\u2074",ve:6 },
-  { sym:"F",n:9,name:"Fluorine",mass:19.00,cat:"nonmetal",g:17,p:2,cfg:"[He] 2s\u00b2 2p\u2075",ve:7 },
-  { sym:"Ne",n:10,name:"Neon",mass:20.18,cat:"noble",g:18,p:2,cfg:"[He] 2s\u00b2 2p\u2076",ve:8 },
-  { sym:"Na",n:11,name:"Sodium",mass:22.99,cat:"metal",g:1,p:3,cfg:"[Ne] 3s\u00b9",ve:1 },
-  { sym:"Mg",n:12,name:"Magnesium",mass:24.31,cat:"metal",g:2,p:3,cfg:"[Ne] 3s\u00b2",ve:2 },
-  { sym:"Al",n:13,name:"Aluminum",mass:26.98,cat:"metal",g:13,p:3,cfg:"[Ne] 3s\u00b2 3p\u00b9",ve:3 },
-  { sym:"Si",n:14,name:"Silicon",mass:28.09,cat:"metalloid",g:14,p:3,cfg:"[Ne] 3s\u00b2 3p\u00b2",ve:4 },
-  { sym:"P",n:15,name:"Phosphorus",mass:30.97,cat:"nonmetal",g:15,p:3,cfg:"[Ne] 3s\u00b2 3p\u00b3",ve:5 },
-  { sym:"S",n:16,name:"Sulfur",mass:32.07,cat:"nonmetal",g:16,p:3,cfg:"[Ne] 3s\u00b2 3p\u2074",ve:6 },
-  { sym:"Cl",n:17,name:"Chlorine",mass:35.45,cat:"nonmetal",g:17,p:3,cfg:"[Ne] 3s\u00b2 3p\u2075",ve:7 },
-  { sym:"Ar",n:18,name:"Argon",mass:39.95,cat:"noble",g:18,p:3,cfg:"[Ne] 3s\u00b2 3p\u2076",ve:8 },
-  { sym:"K",n:19,name:"Potassium",mass:39.10,cat:"metal",g:1,p:4,cfg:"[Ar] 4s\u00b9",ve:1 },
-  { sym:"Ca",n:20,name:"Calcium",mass:40.08,cat:"metal",g:2,p:4,cfg:"[Ar] 4s\u00b2",ve:2 },
-];
-
-function PeriodicExplorer() {
-  return <PeriodicTable3D />;
-}
-
 function ElectronShells() {
+  const NAMES = ["","H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca"];
+  const CFGS = ["","1s1","1s2","[He]2s1","[He]2s2","[He]2s2 2p1","[He]2s2 2p2","[He]2s2 2p3","[He]2s2 2p4","[He]2s2 2p5","[He]2s2 2p6","[Ne]3s1","[Ne]3s2","[Ne]3s2 3p1","[Ne]3s2 3p2","[Ne]3s2 3p3","[Ne]3s2 3p4","[Ne]3s2 3p5","[Ne]3s2 3p6","[Ar]4s1","[Ar]4s2"];
+  const SYMS = ["","H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca"];
   const [z, setZ] = useState(8);
-  const el = PT.find(e => e.n === z) || PT[0];
   const shells = []; let rem = z;
   [2,8,8,2].forEach(mx => { if(rem>0){ const c=Math.min(rem,mx); shells.push(c); rem-=c; }});
   return (
@@ -60,14 +34,14 @@ function ElectronShells() {
       <Slider label="Atomic Number (Z)" value={z} min={1} max={20} step={1} onChange={v=>setZ(Math.round(v))} />
       <div style={{ display:"flex", alignItems:"center", gap:20, marginTop:12 }}>
         <div style={{ position:"relative", width:160, height:160, flexShrink:0 }}>
-          <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:28, height:28, borderRadius:"50%", background:C.blue, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"#fff" }}>{el.sym}</div>
+          <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:28, height:28, borderRadius:"50%", background:C.blue, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"#fff" }}>{SYMS[z]}</div>
           {shells.map((_,si) => { const r=30+si*22; return <div key={`ring-${si}`} style={{ position:"absolute", left:"50%", top:"50%", width:r*2, height:r*2, transform:"translate(-50%,-50%)", borderRadius:"50%", border:`1px dashed ${C.border}` }} />; })}
           {shells.map((cnt,si) => { const r=30+si*22; return Array.from({length:cnt}).map((_,ei) => { const a=(ei/cnt)*Math.PI*2-Math.PI/2; return <div key={`${si}-${ei}`} style={{ position:"absolute", left:80+Math.cos(a)*r-4, top:80+Math.sin(a)*r-4, width:8, height:8, borderRadius:"50%", background:si===shells.length-1?C.green:C.blue }} />; }); })}
         </div>
         <div style={{ fontSize:12, color:C.textMid, lineHeight:1.8 }}>
-          <p style={{ margin:0, fontWeight:600, color:C.text, fontSize:14 }}>{el.name} (Z={z})</p>
+          <p style={{ margin:0, fontWeight:600, color:C.text, fontSize:14 }}>{NAMES[z]} (Z={z})</p>
           {shells.map((c,i) => <p key={i} style={{ margin:0 }}>Shell {i+1}: <b style={{ color:i===shells.length-1?C.green:C.blue }}>{c} e-</b></p>)}
-          <p style={{ margin:"4px 0 0", fontSize:11, fontFamily:F.mono, color:C.blue }}>{el.cfg}</p>
+          <p style={{ margin:"4px 0 0", fontSize:11, fontFamily:F.mono, color:C.blue }}>{CFGS[z]}</p>
           <p style={{ margin:"2px 0 0", color:C.green, fontWeight:600 }}>Valence: {shells[shells.length-1]} e-</p>
         </div>
       </div>
@@ -422,7 +396,7 @@ function MolaritySim() {
    EQUATION EXPLORER DEFINITIONS
    ══════════════════════════════════════════════════════════════════ */
 const CHEM_EQUATIONS = {
-  "atoms": [{ formula:"Mass # = protons + neutrons", params:[{name:"protons",min:1,max:20,step:1,init:6},{name:"neutrons",min:0,max:20,step:1,init:6}], compute:({protons,neutrons})=>`Mass # = ${protons}+${neutrons} = ${protons+neutrons}. Element: ${(PT.find(e=>e.n===protons)||{name:"?"}).name}` }],
+  "atoms": [{ formula:"Mass # = protons + neutrons", params:[{name:"protons",min:1,max:20,step:1,init:6},{name:"neutrons",min:0,max:20,step:1,init:6}], compute:({protons,neutrons})=>{ const names=["","H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca"]; return `Mass # = ${protons}+${neutrons} = ${protons+neutrons}. Element: ${names[protons]||"?"}`; }}],
   "electrons": [{ formula:"Shells: 2, 8, 8, 2 (first 20)", params:[{name:"Z",min:1,max:20,step:1,init:11}], compute:({Z})=>{ let r=Z; const sh=[]; [2,8,8,2].forEach(m=>{if(r>0){const c=Math.min(r,m);sh.push(c);r-=c;}}); return `Z=${Z}: [${sh.join(",")}], valence=${sh[sh.length-1]}`; }}],
   "mole": [
     { formula:"moles = grams / molar mass", params:[{name:"grams",min:1,max:200,step:1,init:44},{name:"MM",min:1,max:200,step:1,init:44}], compute:({grams,MM})=>`${grams} / ${MM} = ${(grams/MM).toFixed(3)} mol` },
@@ -553,9 +527,137 @@ function StatusBadge({ status }) {
   return <span style={{ fontSize:9, fontWeight:600, color:s.color, background:s.bg, padding:"2px 8px", borderRadius:3 }}>{s.l}</span>;
 }
 
+// ── Custom SVG Icons (no emojis, transparent, matching Telpo theme) ──
+const TOOL_ICONS = {
+  periodic: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="6" y="1" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="11" y="1" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="1" y="6" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="6" y="6" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="1" y="11" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="6" y="11" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/><rect x="11" y="11" width="4" height="4" rx="0.5" stroke={c} strokeWidth="1"/></svg>,
+  shells: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" fill={c}/><circle cx="8" cy="8" r="5" stroke={c} strokeWidth="0.7" strokeDasharray="2 1.5"/><circle cx="8" cy="8" r="7" stroke={c} strokeWidth="0.7" strokeDasharray="2 1.5"/></svg>,
+  balancer: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke={c} strokeWidth="1"/><line x1="3" y1="5" x2="13" y2="5" stroke={c} strokeWidth="1"/><circle cx="4" cy="7" r="1.5" stroke={c} strokeWidth="0.7"/><circle cx="12" cy="7" r="1.5" stroke={c} strokeWidth="0.7"/><line x1="6" y1="13" x2="10" y2="13" stroke={c} strokeWidth="1"/></svg>,
+  mole: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke={c} strokeWidth="1"/><path d="M5 9L8 13L11 9" stroke={c} strokeWidth="1" fill="none"/><line x1="2" y1="5" x2="5" y2="5" stroke={c} strokeWidth="0.7"/><line x1="11" y1="5" x2="14" y2="5" stroke={c} strokeWidth="0.7"/></svg>,
+  gas: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke={c} strokeWidth="1"/><circle cx="5" cy="8" r="1" fill={c} opacity="0.5"/><circle cx="8" cy="6" r="1" fill={c} opacity="0.5"/><circle cx="11" cy="9" r="1" fill={c} opacity="0.5"/><circle cx="7" cy="10" r="1" fill={c} opacity="0.5"/></svg>,
+  molarity: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 2L5 6L3 12C3 13 4 14 5 14H11C12 14 13 13 13 12L11 6V2" stroke={c} strokeWidth="1"/><line x1="5" y1="2" x2="11" y2="2" stroke={c} strokeWidth="1"/><path d="M4 10H12" stroke={c} strokeWidth="0.7" strokeDasharray="1.5 1"/></svg>,
+  heating: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="2,13 5,10 7,10 9,6 11,6 14,2" stroke={c} strokeWidth="1" fill="none"/><line x1="2" y1="14" x2="14" y2="14" stroke={c} strokeWidth="0.7"/><line x1="2" y1="14" x2="2" y2="2" stroke={c} strokeWidth="0.7"/></svg>,
+  lewis: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4" stroke={c} strokeWidth="1"/><text x="8" y="10" textAnchor="middle" fontSize="6" fill={c} fontWeight="600">O</text><circle cx="3" cy="8" r="1" fill={c} opacity="0.6"/><circle cx="13" cy="8" r="1" fill={c} opacity="0.6"/><circle cx="8" cy="3" r="1" fill={c} opacity="0.6"/><circle cx="8" cy="13" r="1" fill={c} opacity="0.6"/></svg>,
+  eqShift: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="6" x2="14" y2="6" stroke={c} strokeWidth="1"/><polygon points="12,4 14,6 12,8" fill={c}/><line x1="2" y1="10" x2="14" y2="10" stroke={c} strokeWidth="1"/><polygon points="4,8 2,10 4,12" fill={c}/></svg>,
+  energy: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="14" x2="14" y2="14" stroke={c} strokeWidth="0.7"/><line x1="2" y1="14" x2="2" y2="2" stroke={c} strokeWidth="0.7"/><path d="M3 10L6 10Q8 3 10 6L13 6" stroke={c} strokeWidth="1" fill="none"/></svg>,
+};
+
+// Order: introduction sequence through the chem module
+const TOOL_LIST = [
+  { key:"periodic", label:"3D Periodic Table", match:"periodic" },
+  { key:"shells", label:"Electron Shells", match:"shells" },
+  { key:"balancer", label:"Equation Balancer", match:"balancer" },
+  { key:"mole", label:"Mole Conversion Map", match:"molemap" },
+  { key:"gas", label:"Gas Law Simulator", match:"gasSim" },
+  { key:"molarity", label:"Molarity & Dilution", match:"molarity" },
+  { key:"heating", label:"Heating Curve", match:"heatingCurve" },
+  { key:"lewis", label:"Lewis Structure Helper", match:"lewis" },
+  { key:"eqShift", label:"Equilibrium Shift", match:"eqShift" },
+  { key:"energy", label:"Energy Diagram", match:"activationE" },
+];
+
+const TOOL_COMPONENTS = {
+  periodic: () => <PeriodicTable3D />,
+  shells: () => <ElectronShells />,
+  balancer: () => <BalancerGame />,
+  mole: () => <MoleMap />,
+  gas: () => <GasLawSim />,
+  molarity: () => <MolaritySim />,
+  heating: () => <HeatingCurve />,
+  lewis: () => <LewisHelper />,
+  eqShift: () => <EquilibriumShift />,
+  energy: () => <ActivationEnergyDiagram />,
+};
+
+function ToolBar({ activeInteractive }) {
+  const [open, setOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState(null);
+  const ToolComp = activeTool ? TOOL_COMPONENTS[activeTool] : null;
+  const iconColor = "#6a7fa8";
+  const activeColor = "#60a5fa";
+
+  return (
+    <>
+      {/* Floating button */}
+      <div style={{ position:"fixed", top:16, right:16, zIndex:100 }}>
+        <button onClick={() => setOpen(!open)} style={{
+          width:38, height:38, borderRadius:8, border:`1px solid ${open ? activeColor : "#262c3e"}`,
+          background: open ? "rgba(96,165,250,0.12)" : "rgba(20,24,33,0.9)",
+          cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+          backdropFilter:"blur(8px)", transition:"all 0.2s",
+          boxShadow: open ? `0 0 16px rgba(96,165,250,0.2)` : "0 2px 8px rgba(0,0,0,0.3)",
+        }}>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L10.5 6H14.5L11.5 8.5L12.5 12.5L9 10L5.5 12.5L6.5 8.5L3.5 6H7.5L9 2Z" stroke={open ? activeColor : iconColor} strokeWidth="1.2" fill={open ? `${activeColor}22` : "none"}/>
+          </svg>
+        </button>
+
+        {/* Dropdown panel */}
+        {open && (
+          <div style={{
+            position:"absolute", top:44, right:0, width:200,
+            background:"rgba(16,19,26,0.95)", border:`1px solid #262c3e`,
+            borderRadius:10, backdropFilter:"blur(12px)",
+            boxShadow:"0 8px 32px rgba(0,0,0,0.5)",
+            padding:"6px 0", animation:"fadeIn 0.2s ease",
+          }}>
+            <p style={{ fontSize:9, fontWeight:600, color:"#5a5c66", letterSpacing:1.5, textTransform:"uppercase", margin:"6px 12px 4px", padding:0 }}>Reference Tools</p>
+            {TOOL_LIST.map(tool => {
+              const isActive = activeTool === tool.key;
+              const isMatch = tool.match === activeInteractive;
+              return (
+                <button key={tool.key} onClick={() => { setActiveTool(isActive ? null : tool.key); if(isActive) return; }}
+                  style={{
+                    width:"100%", display:"flex", alignItems:"center", gap:8,
+                    padding:"7px 12px", border:"none", cursor:"pointer",
+                    background: isActive ? "rgba(96,165,250,0.1)" : "transparent",
+                    fontFamily:F.sans, textAlign:"left", transition:"background 0.15s",
+                  }}
+                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.background = "transparent"; }}
+                >
+                  <span style={{ flexShrink:0, opacity: isActive ? 1 : 0.6 }}>
+                    {TOOL_ICONS[tool.key](isActive ? activeColor : isMatch ? "#8a7a6a" : iconColor)}
+                  </span>
+                  <span style={{
+                    fontSize:11, color: isActive ? activeColor : isMatch ? "#d4d2cb" : "#8a8b93",
+                    fontWeight: isMatch ? 600 : 400,
+                  }}>
+                    {tool.label}
+                    {isMatch && <span style={{ fontSize:8, color:"#8a7a6a", marginLeft:4 }}>*</span>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Tool render panel (slides in below toolbar) */}
+      {activeTool && ToolComp && (
+        <div style={{
+          position:"fixed", top:62, right:16, width:"min(480px, calc(100vw - 32px))",
+          maxHeight:"calc(100vh - 80px)", overflowY:"auto", zIndex:99,
+          background:"rgba(16,19,26,0.95)", border:`1px solid #262c3e`,
+          borderRadius:10, backdropFilter:"blur(12px)",
+          boxShadow:"0 8px 32px rgba(0,0,0,0.5)", padding:12,
+          animation:"fadeIn 0.25s ease",
+        }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+            <span style={{ fontSize:11, fontWeight:600, color:"#6a7fa8" }}>
+              {TOOL_LIST.find(t => t.key === activeTool)?.label}
+            </span>
+            <button onClick={() => setActiveTool(null)} style={{
+              background:"none", border:"none", color:"#5a5c66", fontSize:14, cursor:"pointer", padding:"2px 6px",
+            }}>{"\u2715"}</button>
+          </div>
+          <ToolComp />
+        </div>
+      )}
+    </>
+  );
+}
+
 function LectureView({ lecture, status, onStatus, onBack }) {
-  const Interactives = { periodic:PeriodicExplorer, shells:ElectronShells, balancer:BalancerGame, molemap:MoleMap, gasSim:GasLawSim, molarity:MolaritySim, heatingCurve:HeatingCurve, lewis:LewisHelper, eqShift:EquilibriumShift, activationE:ActivationEnergyDiagram };
-  const Interactive = lecture.interactive ? Interactives[lecture.interactive] : null;
   const eqs = lecture.eqKey ? CHEM_EQUATIONS[lecture.eqKey] : null;
   const [showVideo, setShowVideo] = useState(false);
   // Extract YouTube video ID
@@ -606,9 +708,9 @@ function LectureView({ lecture, status, onStatus, onBack }) {
             {lecture.reading.map((para,i) => <p key={i} style={{ fontSize:13, color:C.textMid, lineHeight:1.8, margin:i===0?"0":"12px 0 0" }}>{para}</p>)}
           </div>
         </div>
-        {Interactive && <Interactive />}
         {eqs && <EquationExplorer equations={eqs} />}
         <Practice questions={lecture.practice} storageId={lecture.id} />
+        <ToolBar activeInteractive={lecture.interactive} />
         <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:14, marginTop:16, display:"flex", gap:8 }}>
           <button onClick={()=>onStatus("watched")} style={{ flex:1, padding:"10px 0", borderRadius:6, border:`1px solid ${status==="watched"?C.gold:C.border}`, background:status==="watched"?C.goldDim:C.panel, fontFamily:F.sans, fontSize:12, color:status==="watched"?C.gold:C.textDim, cursor:"pointer", fontWeight:500 }}>Mark Watched</button>
           <button onClick={()=>onStatus("mastered")} style={{ flex:1, padding:"10px 0", borderRadius:6, border:`1px solid ${status==="mastered"?C.green:C.border}`, background:status==="mastered"?C.greenDim:C.panel, fontFamily:F.sans, fontSize:12, color:status==="mastered"?C.green:C.textDim, cursor:"pointer", fontWeight:500 }}>Mark Mastered</button>
