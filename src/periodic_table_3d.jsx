@@ -134,6 +134,9 @@ const EL = [
 const CAT_NAMES = ["Nonmetal","Noble gas","Alkali metal","Alkaline earth","Transition metal","Post-transition","Metalloid","Halogen","Lanthanide","Actinide"];
 const CAT_COLORS = ["#34d399","#a78bfa","#f87171","#fb923c","#60a5fa","#6ee7b7","#fbbf24","#f472b6","#818cf8","#c084fc"];
 
+// Pauling electronegativity values (index = Z, 0 = n/a)
+const EN = [0,2.20,0,0.98,1.57,2.04,2.55,3.04,3.44,3.98,0,0.93,1.31,1.61,1.90,2.19,2.58,3.16,0,0.82,1.00,1.36,1.54,1.63,1.66,1.55,1.83,1.88,1.91,1.90,1.65,1.81,2.01,2.18,2.55,2.96,3.00,0.82,0.95,1.22,1.33,1.6,2.16,1.9,2.2,2.28,2.20,1.93,1.69,1.78,1.96,2.05,2.1,2.66,2.6,0.79,0.89,1.10,1.12,1.13,1.14,1.13,1.17,1.2,1.2,1.1,1.22,1.23,1.24,1.25,1.1,1.27,1.3,1.5,2.36,1.9,2.2,2.20,2.28,2.54,2.00,1.62,2.33,2.02,2.0,2.2,0,0.7,0.9,1.1,1.3,1.5,1.38,1.36,1.28,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
 // ── Compute electron shells for any Z ──
 function getShells(z) {
   const maxPerShell = [2,8,18,32,32,18,8]; // simplified
@@ -429,6 +432,7 @@ export default function PeriodicTable3D() {
                 <span>Neutrons: <b style={{ color: C.text }}>{Math.round(sel[3]) - sel[0]}</b></span>
                 <span>Electrons: <b style={{ color: electronCount !== sel[0] ? (electronCount < sel[0] ? "#f87171" : "#60a5fa") : C.text }}>{electronCount}</b></span>
                 <span>Shells: <b style={{ color: CAT_COLORS[sel[4]] }}>{getShells(electronCount).length}</b></span>
+                <span>Electronegativity: <b style={{ color: EN[sel[0]] ? "#fbbf24" : C.textDim }}>{EN[sel[0]] ? EN[sel[0]].toFixed(2) : "n/a"}</b></span>
               </div>
 
               {/* Electron slider */}
@@ -464,9 +468,9 @@ export default function PeriodicTable3D() {
                   onChange={e => setElectronCount(parseInt(e.target.value))}
                   style={{ width: "100%", accentColor: CAT_COLORS[sel[4]], height: 3, cursor: "pointer" }} />
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: C.textDim, marginTop: 2 }}>
-                  <span>Lose e\u207B (cation +)</span>
+                  <span>Lose e{"\u207B"} (cation +)</span>
                   <span style={{ color: electronCount === sel[0] ? CAT_COLORS[sel[4]] : C.textDim, fontWeight: electronCount === sel[0] ? 600 : 400 }}>Neutral</span>
-                  <span>Gain e\u207B (anion \u2212)</span>
+                  <span>Gain e{"\u207B"} (anion {"\u2212"})</span>
                 </div>
               </div>
 
