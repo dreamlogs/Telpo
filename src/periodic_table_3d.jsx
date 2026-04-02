@@ -298,6 +298,7 @@ export default function PeriodicTable3D() {
   const lastPos = useRef({ x: 0, y: 0 });
   const [selected, setSelected] = useState(null);
   const [electronCount, setElectronCount] = useState(null);
+  const [viewMode, setViewMode] = useState("category"); // "category" | "ions" | "en"
 
   // Reset electrons when selecting new element
   const selectElement = useCallback((z) => {
@@ -363,8 +364,8 @@ export default function PeriodicTable3D() {
         <span style={{ fontSize: 9, color: C.textDim, fontFamily: F.mono }}>Drag=rotate / Shift+Drag=pan / Scroll=zoom</span>
       </div>
 
-      {/* Reset view button */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+      {/* Reset view button + View mode toggles */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
         <button onClick={() => { setRotX(8); setRotY(0); setPanX(0); setPanY(0); setZoom(0.85); }} style={{
           padding: "3px 10px", borderRadius: 4, background: "transparent", border: `1px solid ${C.border}`,
           color: C.textDim, fontSize: 10, cursor: "pointer", fontFamily: F.mono,
@@ -373,6 +374,15 @@ export default function PeriodicTable3D() {
           padding: "3px 10px", borderRadius: 4, background: "transparent", border: `1px solid ${C.border}`,
           color: C.textDim, fontSize: 10, cursor: "pointer", fontFamily: F.mono,
         }}>Flat view</button>
+        <span style={{ width: 1, background: C.border, margin: "0 2px" }} />
+        {[["category","Elements"],["ions","Ion Charges"],["en","Electronegativity"]].map(([k,l]) => (
+          <button key={k} onClick={() => setViewMode(k)} style={{
+            padding: "3px 10px", borderRadius: 4, fontSize: 10, cursor: "pointer", fontFamily: F.mono,
+            background: viewMode === k ? "rgba(96,165,250,0.15)" : "transparent",
+            border: `1px solid ${viewMode === k ? "#60a5fa" : C.border}`,
+            color: viewMode === k ? "#60a5fa" : C.textDim,
+          }}>{l}</button>
+        ))}
       </div>
 
       {/* 3D Container */}
@@ -396,7 +406,19 @@ export default function PeriodicTable3D() {
             const isSel = selected === z;
             const x = (col - 1) * (cw + gap);
             const y = (row - 1) * (ch + gap);
-            const color = CAT_COLORS[cat];
+            const catColor = CAT_COLORS[cat];
+            // Ion view colors
+            const ion = getIonInfo(z);
+            const ionColorMap = { cation: "#f87171", anion: "#60a5fa", both: "#fb923c", noble: "#a78bfa", covalent: "#6ee7b7", unknown: "#5a5c66" };
+            const ionCol = ionColorMap[ion.type] || "#5a5c66";
+            // EN view - gradient from blue (low) to red (high)
+            const enVal = EN[z] || 0;
+            const enCol = enVal > 0 ? `hsl(${Math.round((1 - enVal / 4) * 240)}, 70%, 60%)` : "#5a5c66";
+            // Pick color based on mode
+            const color = viewMode === "ions" ? ionCol : viewMode === "en" ? enCol : catColor;
+            // Ion charge label
+            const ionLabel = ion.charges.length > 0 && ion.charges[0] !== 0
+              ? ion.charges[0] + ion.sign : ion.type === "noble" ? "0" : "";
             return (
               <div key={z} className="el-cell"
                 onClick={(e) => { e.stopPropagation(); selectElement(z); }}
@@ -414,8 +436,22 @@ export default function PeriodicTable3D() {
                 }}>
                 <span style={{ fontSize: 7, color: `${color}99`, fontFamily: F.mono, lineHeight: 1 }}>{z}</span>
                 <span style={{ fontSize: 14, fontWeight: 700, color: isSel ? "#fff" : color, lineHeight: 1.2 }}>{sym}</span>
-                <span style={{ fontSize: 5.5, color: `${color}77`, lineHeight: 1, marginTop: 1, maxWidth: cw - 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-                <span style={{ fontSize: 5.5, color: `${color}55`, fontFamily: F.mono, lineHeight: 1 }}>{mass}</span>
+                {viewMode === "category" && (
+                  <>
+                    <span style={{ fontSize: 5.5, color: `${color}77`, lineHeight: 1, marginTop: 1, maxWidth: cw - 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+                    <span style={{ fontSize: 5.5, color: `${color}55`, fontFamily: F.mono, lineHeight: 1 }}>{mass}</span>
+                  </>
+                )}
+                {viewMode === "ions" && (
+                  <span style={{ fontSize: 8, fontWeight: 700, color, fontFamily: F.mono, lineHeight: 1, marginTop: 1 }}>
+                    {ionLabel || "\u00B7\u00B7\u00B7"}
+                  </span>
+                )}
+                {viewMode === "en" && (
+                  <span style={{ fontSize: 8, fontWeight: 600, color, fontFamily: F.mono, lineHeight: 1, marginTop: 1 }}>
+                    {enVal > 0 ? enVal.toFixed(1) : "n/a"}
+                  </span>
+                )}
               </div>
             );
           })}
@@ -425,14 +461,33 @@ export default function PeriodicTable3D() {
         </div>
       </div>
 
-      {/* Legend */}
+      {/* Legend - changes with view mode */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, justifyContent: "center" }}>
-        {CAT_NAMES.map((name, i) => (
+        {viewMode === "category" && CAT_NAMES.map((name, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <div style={{ width: 7, height: 7, borderRadius: 2, background: CAT_COLORS[i] }} />
             <span style={{ fontSize: 9, color: C.textDim }}>{name}</span>
           </div>
         ))}
+        {viewMode === "ions" && [
+          ["#f87171","Cation (+): loses e\u207B"],
+          ["#60a5fa","Anion (\u2212): gains e\u207B"],
+          ["#fb923c","Variable charge"],
+          ["#a78bfa","Noble gas (0)"],
+          ["#6ee7b7","Covalent (shares e\u207B)"],
+        ].map(([c,l],i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <div style={{ width: 7, height: 7, borderRadius: 2, background: c }} />
+            <span style={{ fontSize: 9, color: C.textDim }}>{l}</span>
+          </div>
+        ))}
+        {viewMode === "en" && (
+          <>
+            <span style={{ fontSize: 9, color: C.textDim }}>Low EN</span>
+            <div style={{ width: 80, height: 7, borderRadius: 2, background: "linear-gradient(to right, hsl(240,70%,60%), hsl(120,70%,60%), hsl(0,70%,60%))" }} />
+            <span style={{ fontSize: 9, color: C.textDim }}>High EN (F = 3.98)</span>
+          </>
+        )}
       </div>
 
       {/* ── Element Detail Panel with Atom Model ── */}
