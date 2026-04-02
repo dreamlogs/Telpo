@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { C, F, Slider, Practice, EquationExplorer, Tip } from "./shared_ui";
 import PeriodicTable3D from "./periodic_table_3d";
+import MoleculeViewer from "./molecule_viewer";
 
 /*
  * Chemistry Placement Prep for Telpo
@@ -539,6 +540,7 @@ const TOOL_ICONS = {
   lewis: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4" stroke={c} strokeWidth="1"/><text x="8" y="10" textAnchor="middle" fontSize="6" fill={c} fontWeight="600">O</text><circle cx="3" cy="8" r="1" fill={c} opacity="0.6"/><circle cx="13" cy="8" r="1" fill={c} opacity="0.6"/><circle cx="8" cy="3" r="1" fill={c} opacity="0.6"/><circle cx="8" cy="13" r="1" fill={c} opacity="0.6"/></svg>,
   eqShift: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="6" x2="14" y2="6" stroke={c} strokeWidth="1"/><polygon points="12,4 14,6 12,8" fill={c}/><line x1="2" y1="10" x2="14" y2="10" stroke={c} strokeWidth="1"/><polygon points="4,8 2,10 4,12" fill={c}/></svg>,
   energy: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="14" x2="14" y2="14" stroke={c} strokeWidth="0.7"/><line x1="2" y1="14" x2="2" y2="2" stroke={c} strokeWidth="0.7"/><path d="M3 10L6 10Q8 3 10 6L13 6" stroke={c} strokeWidth="1" fill="none"/></svg>,
+  molecule: (c) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke={c} strokeWidth="1"/><circle cx="4" cy="13" r="2" stroke={c} strokeWidth="1"/><circle cx="12" cy="13" r="2" stroke={c} strokeWidth="1"/><line x1="6.5" y1="7.5" x2="5" y2="11" stroke={c} strokeWidth="1"/><line x1="9.5" y1="7.5" x2="11" y2="11" stroke={c} strokeWidth="1"/></svg>,
 };
 
 // Order: introduction sequence through the chem module
@@ -551,6 +553,7 @@ const TOOL_LIST = [
   { key:"molarity", label:"Molarity & Dilution", match:"molarity" },
   { key:"heating", label:"Heating Curve", match:"heatingCurve" },
   { key:"lewis", label:"Lewis Structure Helper", match:"lewis" },
+  { key:"molecule", label:"Molecule Viewer", match:"molecule" },
   { key:"eqShift", label:"Equilibrium Shift", match:"eqShift" },
   { key:"energy", label:"Energy Diagram", match:"activationE" },
 ];
@@ -564,6 +567,7 @@ const TOOL_COMPONENTS = {
   molarity: () => <MolaritySim />,
   heating: () => <HeatingCurve />,
   lewis: () => <LewisHelper />,
+  molecule: () => <MoleculeViewer />,
   eqShift: () => <EquilibriumShift />,
   energy: () => <ActivationEnergyDiagram />,
 };
