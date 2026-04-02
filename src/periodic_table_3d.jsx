@@ -137,6 +137,47 @@ const CAT_COLORS = ["#34d399","#a78bfa","#f87171","#fb923c","#60a5fa","#6ee7b7",
 // Pauling electronegativity values (index = Z, 0 = n/a)
 const EN = [0,2.20,0,0.98,1.57,2.04,2.55,3.04,3.44,3.98,0,0.93,1.31,1.61,1.90,2.19,2.58,3.16,0,0.82,1.00,1.36,1.54,1.63,1.66,1.55,1.83,1.88,1.91,1.90,1.65,1.81,2.01,2.18,2.55,2.96,3.00,0.82,0.95,1.22,1.33,1.6,2.16,1.9,2.2,2.28,2.20,1.93,1.69,1.78,1.96,2.05,2.1,2.66,2.6,0.79,0.89,1.10,1.12,1.13,1.14,1.13,1.17,1.2,1.2,1.1,1.22,1.23,1.24,1.25,1.1,1.27,1.3,1.5,2.36,1.9,2.2,2.20,2.28,2.54,2.00,1.62,2.33,2.02,2.0,2.2,0,0.7,0.9,1.1,1.3,1.5,1.38,1.36,1.28,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
+// Common ion charges: [Z] = { charges: [array], label, type }
+// type: "cation" (loses e-), "anion" (gains e-), "both" (transition), "noble" (none)
+function getIonInfo(z) {
+  // Group 1: 1+
+  if ([1,3,11,19,37,55,87].includes(z)) return { charges: [1], sign: "+", type: "cation", reason: "Loses 1 electron to get noble gas config" };
+  // Group 2: 2+
+  if ([4,12,20,38,56,88].includes(z)) return { charges: [2], sign: "+", type: "cation", reason: "Loses 2 electrons to get noble gas config" };
+  // Group 13 (main): 3+
+  if ([13,31,49].includes(z)) return { charges: [3], sign: "+", type: "cation", reason: "Loses 3 electrons to get noble gas config" };
+  // Group 15 (nonmetals): 3-
+  if ([7,15,33].includes(z)) return { charges: [3], sign: "\u2212", type: "anion", reason: "Gains 3 electrons to complete octet" };
+  // Group 16 (nonmetals): 2-
+  if ([8,16,34].includes(z)) return { charges: [2], sign: "\u2212", type: "anion", reason: "Gains 2 electrons to complete octet" };
+  // Group 17 (halogens): 1-
+  if ([9,17,35,53].includes(z)) return { charges: [1], sign: "\u2212", type: "anion", reason: "Gains 1 electron to complete octet" };
+  // Noble gases: 0
+  if ([2,10,18,36,54,86].includes(z)) return { charges: [0], sign: "", type: "noble", reason: "Full outer shell, stable as is" };
+  // Common transition metals with multiple charges
+  if (z === 26) return { charges: [2,3], sign: "+", type: "both", reason: "Iron: Fe\u00B2\u207A or Fe\u00B3\u207A depending on compound" };
+  if (z === 29) return { charges: [1,2], sign: "+", type: "both", reason: "Copper: Cu\u207A or Cu\u00B2\u207A depending on compound" };
+  if (z === 30) return { charges: [2], sign: "+", type: "cation", reason: "Zinc always forms Zn\u00B2\u207A" };
+  if (z === 47) return { charges: [1], sign: "+", type: "cation", reason: "Silver always forms Ag\u207A" };
+  if (z === 24) return { charges: [2,3,6], sign: "+", type: "both", reason: "Chromium: Cr\u00B2\u207A, Cr\u00B3\u207A, or Cr\u2076\u207A" };
+  if (z === 25) return { charges: [2,4,7], sign: "+", type: "both", reason: "Manganese: multiple oxidation states" };
+  if (z === 27) return { charges: [2,3], sign: "+", type: "both", reason: "Cobalt: Co\u00B2\u207A or Co\u00B3\u207A" };
+  if (z === 28) return { charges: [2], sign: "+", type: "cation", reason: "Nickel usually forms Ni\u00B2\u207A" };
+  if (z === 50) return { charges: [2,4], sign: "+", type: "both", reason: "Tin: Sn\u00B2\u207A or Sn\u2074\u207A" };
+  if (z === 82) return { charges: [2,4], sign: "+", type: "both", reason: "Lead: Pb\u00B2\u207A or Pb\u2074\u207A" };
+  // Boron / Carbon / Silicon - mostly covalent
+  if ([5,6,14].includes(z)) return { charges: [], sign: "", type: "covalent", reason: "Typically forms covalent bonds, not ions" };
+  // Other transition metals: generally 2+ or 3+
+  if (z >= 21 && z <= 30) return { charges: [2,3], sign: "+", type: "both", reason: "Transition metal: variable charges, use Roman numerals" };
+  if (z >= 39 && z <= 48) return { charges: [2,3], sign: "+", type: "both", reason: "Transition metal: variable charges, use Roman numerals" };
+  if (z >= 72 && z <= 80) return { charges: [2,3,4], sign: "+", type: "both", reason: "Transition metal: variable charges" };
+  // Lanthanides/Actinides: usually 3+
+  if (z >= 57 && z <= 71) return { charges: [3], sign: "+", type: "cation", reason: "Lanthanide: typically forms 3+ ions" };
+  if (z >= 89 && z <= 103) return { charges: [3,4], sign: "+", type: "both", reason: "Actinide: typically 3+ or 4+" };
+  // Default
+  return { charges: [], sign: "", type: "unknown", reason: "" };
+}
+
 // ── Compute electron shells for any Z ──
 function getShells(z) {
   const maxPerShell = [2,8,18,32,32,18,8]; // simplified
@@ -434,6 +475,40 @@ export default function PeriodicTable3D() {
                 <span>Shells: <b style={{ color: CAT_COLORS[sel[4]] }}>{getShells(electronCount).length}</b></span>
                 <span>Electronegativity: <b style={{ color: EN[sel[0]] ? "#fbbf24" : C.textDim }}>{EN[sel[0]] ? EN[sel[0]].toFixed(2) : "n/a"}</b></span>
               </div>
+
+              {/* Ion charge info */}
+              {(() => {
+                const ion = getIonInfo(sel[0]);
+                if (!ion.reason) return null;
+                const colorMap = { cation: "#f87171", anion: "#60a5fa", both: "#fb923c", noble: "#a78bfa", covalent: "#6ee7b7", unknown: C.textDim };
+                const col = colorMap[ion.type] || C.textDim;
+                return (
+                  <div style={{
+                    marginBottom: 10, padding: "8px 12px", borderRadius: 6,
+                    background: `${col}0a`, border: `1px solid ${col}22`,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: col, textTransform: "uppercase", letterSpacing: 1 }}>
+                        {ion.type === "noble" ? "No ion" : ion.type === "covalent" ? "Covalent" : ion.type === "both" ? "Variable ion" : ion.type === "cation" ? "Cation (+)" : "Anion (\u2212)"}
+                      </span>
+                      {ion.charges.length > 0 && ion.charges[0] !== 0 && (
+                        <div style={{ display: "flex", gap: 4 }}>
+                          {ion.charges.map((c, i) => (
+                            <span key={i} style={{
+                              padding: "1px 6px", borderRadius: 3, fontSize: 12, fontWeight: 700,
+                              fontFamily: F.mono, color: col,
+                              background: `${col}18`, border: `1px solid ${col}33`,
+                            }}>
+                              {c}{ion.sign}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 11, color: C.textMid, margin: 0, lineHeight: 1.5 }}>{ion.reason}</p>
+                  </div>
+                );
+              })()}
 
               {/* Electron slider */}
               <div style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 6, background: "rgba(255,255,255,0.03)", border: `1px solid ${C.border}` }}>
