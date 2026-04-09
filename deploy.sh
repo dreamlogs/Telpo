@@ -3,25 +3,35 @@ TELPO="$HOME/telpo/src"
 DL="$HOME/Downloads"
 echo "Scanning Downloads for Telpo files..."
 copied=0
-copy_latest() {
-  local pattern=$1 dest=$2
-  local latest=$(ls -t "$DL"/${pattern}*.jsx 2>/dev/null | head -1)
-  if [ -n "$latest" ]; then
-    cp "$latest" "$TELPO/$dest"
-    echo "  OK: $(basename $latest) -> src/$dest"
+copy_newest() {
+  local dest=$1
+  shift
+  local newest=""
+  local newest_time=0
+  for pattern in "$@"; do
+    local f=$(ls -t "$DL"/${pattern}*.jsx 2>/dev/null | head -1)
+    if [ -n "$f" ]; then
+      local t=$(stat -f %m "$f")
+      if [ "$t" -gt "$newest_time" ]; then
+        newest="$f"
+        newest_time="$t"
+      fi
+    fi
+  done
+  if [ -n "$newest" ]; then
+    cp "$newest" "$TELPO/$dest"
+    echo "  OK: $(basename $newest) -> src/$dest"
     ((copied++))
   fi
 }
-copy_latest "chem_placement" "chem_placement.jsx"
-copy_latest "chemmod" "chem_placement.jsx"
-copy_latest "periodic_table" "periodic_table_3d.jsx"
-copy_latest "pt3d" "periodic_table_3d.jsx"
-copy_latest "molecule_viewer" "molecule_viewer.jsx"
-copy_latest "shared_ui" "shared_ui.jsx"
-copy_latest "App" "App.jsx"
-copy_latest "calc_lab" "calc_lab.jsx"
-copy_latest "physics" "physics.jsx"
-copy_latest "coding" "coding.jsx"
+copy_newest "chem_placement.jsx" "chem_placement" "chemmod"
+copy_newest "periodic_table_3d.jsx" "periodic_table" "pt3d"
+copy_newest "molecule_viewer.jsx" "molecule_viewer"
+copy_newest "shared_ui.jsx" "shared_ui"
+copy_newest "App.jsx" "App" "AppDark"
+copy_newest "calc_lab.jsx" "calc_lab"
+copy_newest "physics.jsx" "physics"
+copy_newest "coding.jsx" "coding"
 if [ $copied -eq 0 ]; then
   echo "  No new .jsx files found."
   exit 0
