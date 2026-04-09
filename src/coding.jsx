@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { C, F, Practice } from "./shared_ui";
+
+const C = {
+  bg:"#ffffff",panel:"#f8f9fb",border:"#e8eaef",graphBg:"#fcfcfd",
+  blue:"#4da3ff",blueDim:"rgba(77,163,255,0.08)",
+  silver:"#9ca3af",silverLight:"#c9cdd4",
+  text:"#1a1a2e",textMid:"#5a5f72",textDim:"#9298a8",textLight:"#b4b9c6",
+  green:"#34d399",greenDim:"rgba(52,211,153,0.1)",gold:"#fbbf24",goldDim:"rgba(251,191,36,0.08)",
+};
+const F={sans:"'Inter','SF Pro Display',system-ui,sans-serif",mono:"'SF Mono','Menlo',monospace"};
 
 const CPP_UNITS=[
   {id:"c0",title:"Foundations",lectures:[
@@ -37,7 +45,7 @@ const CPP_UNITS=[
     {id:"cpp2.3",title:"Servo Motors",yt:"https://www.youtube.com/watch?v=kUHmYKWwuWs",duration:"14:00",
       questions:[{q:"What library do you include for servo control?",a:`#include <Servo.h>`}]},
     {id:"cpp2.4",title:"Ultrasonic Distance Sensor",yt:"https://www.youtube.com/watch?v=6F1B_N6LuKw",duration:"16:00",
-      questions:[{q:"How does an ultrasonic sensor measure distance?",a:"Sends a sound pulse, measures time for echo to return. d = (time * speed_of_sound) / 2"}]},
+      questions:[{q:"How does an ultrasonic sensor measure distance?",a:"Sends a sound pulse, measures time for echo to return. d = (time × speed_of_sound) / 2"}]},
   ]},
   {id:"c3",title:"Advanced Arduino",lectures:[
     {id:"cpp3.1",title:"I2C Communication",yt:"https://www.youtube.com/watch?v=6IAkYpmA1DQ",duration:"20:00",
@@ -47,9 +55,9 @@ const CPP_UNITS=[
     {id:"cpp3.3",title:"Interrupts",yt:"https://www.youtube.com/watch?v=QtyOiLNkNZg",duration:"15:00",
       questions:[{q:"What is an interrupt?",a:"A signal that pauses the main program to run a special function (ISR) immediately."}]},
     {id:"cpp3.4",title:"EEPROM and Persistent Storage",yt:"https://www.youtube.com/watch?v=ShqvATqXA7g",duration:"12:00",
-      questions:[{q:"What is EEPROM used for?",a:"Storing data that persists after power off. Limited write cycles (around 100,000)."}]},
+      questions:[{q:"What is EEPROM used for?",a:"Storing data that persists after power off. Limited write cycles (~100,000)."}]},
     {id:"cpp3.5",title:"Libraries and Building Projects",yt:"https://www.youtube.com/watch?v=KQwhFGBLCJM",duration:"20:00",
-      questions:[{q:"How do you install a library in Arduino IDE?",a:"Sketch then Include Library then Manage Libraries then search and install."}]},
+      questions:[{q:"How do you install a library in Arduino IDE?",a:"Sketch → Include Library → Manage Libraries → search and install."}]},
     {id:"cpp3.6",title:"Project: Synthesizer Module",yt:"https://www.youtube.com/watch?v=2k2MaLRYKKI",duration:"25:00",
       questions:[{q:"How do you generate a tone on Arduino?",a:`tone(pin, frequency, duration) outputs a square wave at the given frequency.`}]},
   ]},
@@ -61,14 +69,14 @@ const RUST_UNITS=[
       questions:[{q:"What command creates a new Rust project?",a:"cargo new project_name"},{q:"What command compiles and runs?",a:"cargo run"}],
       code:`fn main() {\n    println!("Hello, world!");\n}`},
     {id:"rs0.2",title:"Variables, Types, and Mutability",yt:"https://www.youtube.com/watch?v=t047Hseyj_k",duration:"20:00",
-      questions:[{q:"Are Rust variables mutable by default?",a:"No. Use let mut x = 5 to make them mutable."},{q:"Name 4 scalar types in Rust.",a:"i32, f64, bool, char"}],
+      questions:[{q:"Are Rust variables mutable by default?",a:"No. Use `let mut x = 5;` to make them mutable."},{q:"Name 4 scalar types in Rust.",a:"i32, f64, bool, char"}],
       code:`let x = 5;\nlet mut y = 10;\ny += x;\nprintln!("{}", y);`},
     {id:"rs0.3",title:"Functions and Control Flow",yt:"https://www.youtube.com/watch?v=pMhDOoSfyPA",duration:"22:00",
       questions:[{q:"Write a function that returns the square of an i32.",a:`fn square(x: i32) -> i32 {\n    x * x\n}`},{q:"Does Rust require explicit return?",a:"No. The last expression without a semicolon is returned."}]},
   ]},
   {id:"r1",title:"Ownership and Borrowing",lectures:[
     {id:"rs1.1",title:"Ownership Rules",yt:"https://www.youtube.com/watch?v=lQ7XF-6HYGc",duration:"25:00",
-      questions:[{q:"What are the 3 ownership rules?",a:"1) Each value has one owner. 2) Only one owner at a time. 3) Value dropped when owner goes out of scope."},{q:"What happens after let s2 = s1 for a String?",a:"s1 is moved to s2. s1 is no longer valid."}]},
+      questions:[{q:"What are the 3 ownership rules?",a:"1) Each value has one owner. 2) Only one owner at a time. 3) Value dropped when owner goes out of scope."},{q:"What happens after `let s2 = s1;` for a String?",a:"s1 is moved to s2. s1 is no longer valid."}]},
     {id:"rs1.2",title:"References and Borrowing",yt:"https://www.youtube.com/watch?v=lQ7XF-6HYGc",duration:"20:00",
       questions:[{q:"What is the difference between &x and &mut x?",a:"&x is an immutable reference (can read). &mut x is a mutable reference (can modify)."},{q:"Can you have multiple mutable references?",a:"No. One mutable reference OR multiple immutable references, never both."}],
       code:`fn length(s: &String) -> usize {\n    s.len()\n}\nlet s = String::from("hello");\nprintln!("{}", length(&s));`},
@@ -107,12 +115,30 @@ const RUST_UNITS=[
 ];
 
 const CURRICULA = { cpp: CPP_UNITS, rust: RUST_UNITS };
-const KEYS = { cpp: "Telpo-cpp-v1", rust: "Telpo-rust-v1" };
+const KEYS = { cpp: "telpo-cpp-v1", rust: "telpo-rust-v1" };
 const TITLES = { cpp: "Arduino C++", rust: "Rust" };
 const DESCS = { cpp: "Embedded systems, sensors, actuators, and hardware programming.", rust: "Systems programming from ownership to concurrency." };
 
 function loadP(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):{};}catch{return{};}}
 function saveP(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch{}}
+
+function Practice({questions}){
+  const [r,setR]=useState({});
+  if(!questions||!questions.length)return null;
+  const total=questions.length,done=Object.keys(r).length;
+  return <div style={{marginTop:16}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+      <p style={{fontFamily:F.sans,fontSize:11,fontWeight:600,color:C.textDim,letterSpacing:1.5,textTransform:"uppercase",margin:0}}>Practice ({done}/{total})</p>
+      <button onClick={()=>setR({})} style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:3,padding:"3px 8px",fontFamily:F.sans,fontSize:10,color:C.textDim,cursor:"pointer"}}>Reset</button>
+    </div>
+    <div style={{height:2,background:C.border,borderRadius:1,marginBottom:8,overflow:"hidden"}}><div style={{height:"100%",width:`${(done/total)*100}%`,background:C.green,transition:"width 0.3s"}}/></div>
+    {questions.map((q,i)=><div key={i} style={{background:C.panel,borderRadius:4,border:`1px solid ${C.border}`,padding:"10px 12px",marginBottom:4}}>
+      <p style={{color:C.text,fontFamily:F.sans,fontSize:12,margin:0,lineHeight:1.6}}>{q.q}</p>
+      {r[i]?<p style={{color:C.blue,fontFamily:F.mono,fontSize:11,margin:"6px 0 0",lineHeight:1.6,padding:"6px 8px",background:C.blueDim,borderRadius:3,whiteSpace:"pre-wrap"}}>{q.a}</p>
+      :<button onClick={()=>setR(p=>({...p,[i]:true}))} style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:3,padding:"3px 10px",fontFamily:F.sans,fontSize:10,color:C.textDim,cursor:"pointer",marginTop:6}}>Show answer</button>}
+    </div>)}
+  </div>;
+}
 
 export default function CodingLab({subject,onBack}){
   const units=CURRICULA[subject]||[];
@@ -126,8 +152,8 @@ export default function CodingLab({subject,onBack}){
   if(view==="map")return(
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
       <div style={{paddingTop:24}}>
-        <button onClick={onBack} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>Back to Home</button>
-        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>Telpo</p>
+        <button onClick={onBack} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>← Home</button>
+        <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>telpo</p>
         <h1 style={{fontSize:24,fontWeight:600,color:C.text,margin:"0 0 6px"}}>{TITLES[subject]}</h1>
         <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>{DESCS[subject]}</p>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:28}}>
@@ -145,7 +171,7 @@ export default function CodingLab({subject,onBack}){
               background:s==="mastered"?C.greenDim:s==="watched"?C.goldDim:C.panel,
               color:s==="mastered"?C.green:s==="watched"?C.gold:C.textLight,
               border:`1px solid ${s==="mastered"?C.green:s==="watched"?C.gold:C.border}`}}>
-              {s==="mastered"?"ok":"o"}</span>
+              {s==="mastered"?"✓":"○"}</span>
             <div style={{flex:1}}>
               <span style={{fontSize:13,color:C.text,fontWeight:450}}>{l.title}</span>
               <div style={{display:"flex",gap:8,marginTop:1}}>
@@ -154,10 +180,10 @@ export default function CodingLab({subject,onBack}){
                 {l.code&&<span style={{fontSize:10,color:C.blue}}>code</span>}
               </div>
             </div>
-            <span style={{color:C.textLight,fontSize:13}}></span>
+            <span style={{color:C.textLight,fontSize:13}}>→</span>
           </div>);})}
       </div>)}
-      <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO {TITLES[subject].toUpperCase()} v1.1</p>
+      <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO {TITLES[subject].toUpperCase()} v1.0</p>
     </div>
   );
 
@@ -165,7 +191,7 @@ export default function CodingLab({subject,onBack}){
   return(
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
       <div style={{paddingTop:24}}>
-        <button onClick={()=>setView("map")} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:16}}>Back</button>
+        <button onClick={()=>setView("map")} style={{background:"transparent",border:"none",color:C.textDim,fontFamily:F.sans,fontSize:12,cursor:"pointer",padding:0,marginBottom:16}}>← Back</button>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
           <div>
             <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2,textTransform:"uppercase",margin:"0 0 2px"}}>{l.unitTitle}</p>
@@ -174,14 +200,14 @@ export default function CodingLab({subject,onBack}){
           <a href={l.yt} target="_blank" rel="noopener noreferrer" style={{
             fontSize:11,color:C.blue,textDecoration:"none",fontFamily:F.mono,
             padding:"6px 12px",border:`1px solid ${C.blue}`,borderRadius:4,flexShrink:0,marginTop:4,
-          }}>YouTube</a>
+          }}>▶ YouTube</a>
         </div>
         <div style={{display:"flex",gap:6,marginBottom:16}}>
           <span style={{fontSize:11,color:C.textDim,fontFamily:F.mono}}>{l.duration}</span>
         </div>
         <div style={{display:"flex",gap:6,marginBottom:20}}>
           {[{k:"watched",l2:"Watched",c:C.gold,bg:C.goldDim},{k:"mastered",l2:"Mastered",c:C.green,bg:C.greenDim}].map(v=>(
-            <button key={v.k} onClick={()=>toggle(l.id,v.k)} style={{background:s===v.k?v.bg:"transparent",color:s===v.k?v.c:C.textDim,border:`1px solid ${s===v.k?v.c:C.border}`,borderRadius:3,padding:"5px 12px",fontFamily:F.sans,fontSize:11,cursor:"pointer",fontWeight:500}}>{s===v.k?"ok ":""}{v.l2}</button>))}
+            <button key={v.k} onClick={()=>toggle(l.id,v.k)} style={{background:s===v.k?v.bg:"transparent",color:s===v.k?v.c:C.textDim,border:`1px solid ${s===v.k?v.c:C.border}`,borderRadius:3,padding:"5px 12px",fontFamily:F.sans,fontSize:11,cursor:"pointer",fontWeight:500}}>{s===v.k?"✓ ":""}{v.l2}</button>))}
         </div>
 
         {l.code&&<div style={{marginBottom:16}}>

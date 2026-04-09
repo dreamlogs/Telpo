@@ -99,64 +99,39 @@ function BalancerGame() {
 }
 
 function MoleMap() {
-  const [mode, setMode] = useState("g2mol"); // g2mol, mol2g, mol2part
   const [g, setG] = useState(36);
   const [mm, setMM] = useState(18);
-  const [mol, setMol] = useState(2);
-  const presets = [{n:"H\u2082O",m:18},{n:"CO\u2082",m:44},{n:"NaCl",m:58.5},{n:"O\u2082",m:32},{n:"CaCO\u2083",m:100},{n:"H\u2082SO\u2084",m:98},{n:"C\u2086H\u2081\u2082O\u2086",m:180}];
+  const mol = mm>0 ? g/mm : 0;
+  const part = mol * 6.022e23;
   const sci = (n) => { if(n===0) return "0"; const e=Math.floor(Math.log10(Math.abs(n))); return `${(n/10**e).toFixed(2)} \u00d7 10^${e}`; };
-  const result = mode === "g2mol" ? { mol: mm>0 ? g/mm : 0, get part() { return this.mol * 6.022e23; }, get grams() { return g; } }
-    : mode === "mol2g" ? { mol, get part() { return mol * 6.022e23; }, get grams() { return mol * mm; } }
-    : { mol, get part() { return mol * 6.022e23; }, get grams() { return mol * mm; } };
   return (
     <div style={{ margin:"12px 0", padding:16, background:C.panel, borderRadius:8, border:`1px solid ${C.border}` }}>
-      <p style={{ fontSize:10, fontWeight:600, color:C.textDim, letterSpacing:1.5, textTransform:"uppercase", margin:"0 0 8px" }}>Interactive: Mole Conversion Map</p>
-      {/* Mode toggle */}
-      <div style={{ display:"flex", gap:4, marginBottom:10 }}>
-        {[["g2mol","Grams \u2192 Moles"],["mol2g","Moles \u2192 Grams"],["mol2part","Moles \u2192 Particles"]].map(([k,l]) => (
-          <button key={k} onClick={() => setMode(k)} style={{
-            padding:"4px 10px", borderRadius:4, fontSize:10, cursor:"pointer", fontFamily:F.sans,
-            background: mode===k ? "rgba(96,165,250,0.12)" : "transparent",
-            border:`1px solid ${mode===k ? C.blue : C.border}`, color: mode===k ? C.blue : C.textDim,
-          }}>{l}</button>
-        ))}
-      </div>
-      {/* Preset compounds */}
-      <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:10 }}>
-        {presets.map(p => (
-          <button key={p.n} onClick={() => setMM(p.m)} style={{
-            padding:"3px 8px", borderRadius:3, fontSize:9, fontFamily:F.mono, cursor:"pointer",
-            background: mm===p.m ? C.blueDim : "transparent", border:`1px solid ${mm===p.m ? C.blue : C.border}`,
-            color: mm===p.m ? C.blue : C.textDim,
-          }}>{p.n} ({p.m})</button>
-        ))}
-      </div>
-      {mode === "g2mol" && <Slider label="Grams" value={g} min={1} max={500} step={1} onChange={setG} />}
-      {mode !== "g2mol" && <Slider label="Moles" value={mol} min={0.1} max={20} step={0.1} onChange={setMol} />}
-      <Slider label="Molar Mass (g/mol)" value={mm} min={1} max={300} step={1} onChange={setMM} />
+      <p style={{ fontSize:10, fontWeight:600, color:C.textDim, letterSpacing:1.5, textTransform:"uppercase", margin:"0 0 10px" }}>Interactive: Mole Conversion Map</p>
+      <Slider label="Grams" value={g} min={1} max={200} step={1} onChange={setG} />
+      <Slider label="Molar Mass (g/mol)" value={mm} min={1} max={200} step={1} onChange={setMM} />
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:0, margin:"14px 0", flexWrap:"wrap" }}>
         <div style={{ padding:"8px 12px", background:C.blueDim, borderRadius:8, textAlign:"center", minWidth:70 }}>
           <div style={{ fontSize:9, color:C.textDim }}>GRAMS</div>
-          <div style={{ fontSize:16, fontWeight:700, color:C.blue, fontFamily:F.mono }}>{result.grams.toFixed(1)}</div>
+          <div style={{ fontSize:18, fontWeight:700, color:C.blue, fontFamily:F.mono }}>{g}</div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"0 5px" }}>
-          <span style={{ fontSize:14, color:C.textDim }}>{"\u21C4"}</span>
-          <span style={{ fontSize:8, color:C.textDim, fontFamily:F.mono }}>{"\u00F7"} {mm}</span>
+          <span style={{ fontSize:14, color:C.textDim }}>\u2192</span>
+          <span style={{ fontSize:8, color:C.textDim, fontFamily:F.mono }}>\u00f7 {mm}</span>
         </div>
         <div style={{ padding:"8px 12px", background:C.greenDim, borderRadius:8, textAlign:"center", minWidth:70 }}>
           <div style={{ fontSize:9, color:C.textDim }}>MOLES</div>
-          <div style={{ fontSize:16, fontWeight:700, color:C.green, fontFamily:F.mono }}>{result.mol.toFixed(3)}</div>
+          <div style={{ fontSize:18, fontWeight:700, color:C.green, fontFamily:F.mono }}>{mol.toFixed(2)}</div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"0 5px" }}>
-          <span style={{ fontSize:14, color:C.textDim }}>{"\u21C4"}</span>
-          <span style={{ fontSize:8, color:C.textDim, fontFamily:F.mono }}>{"\u00D7"} 6.022e23</span>
+          <span style={{ fontSize:14, color:C.textDim }}>\u2192</span>
+          <span style={{ fontSize:8, color:C.textDim, fontFamily:F.mono }}>\u00d7 6.022e23</span>
         </div>
         <div style={{ padding:"8px 12px", background:"rgba(167,139,250,0.08)", borderRadius:8, textAlign:"center", minWidth:90 }}>
           <div style={{ fontSize:9, color:C.textDim }}>PARTICLES</div>
-          <div style={{ fontSize:13, fontWeight:700, color:"#a78bfa", fontFamily:F.mono }}>{sci(result.part)}</div>
+          <div style={{ fontSize:13, fontWeight:700, color:"#a78bfa", fontFamily:F.mono }}>{sci(part)}</div>
         </div>
       </div>
-      <Tip text="The mole is always the bridge. Grams \u2192 moles (divide by molar mass) \u2192 particles (multiply by Avogadro's number). Reverse the operations to go backwards. Pick a compound above to auto-set the molar mass." />
+      <Tip text="The mole is always the bridge. Grams \u2192 moles (divide by molar mass) \u2192 particles (multiply by Avogadro's number). Reverse the operations to go backwards." />
     </div>
   );
 }
@@ -600,166 +575,86 @@ const TOOL_COMPONENTS = {
 function ToolBar({ activeInteractive }) {
   const [open, setOpen] = useState(false);
   const [activeTool, setActiveTool] = useState(null);
-  const [fullscreen, setFullscreen] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [showSwitch, setShowSwitch] = useState(false);
   const ToolComp = activeTool ? TOOL_COMPONENTS[activeTool] : null;
   const iconColor = "#6a7fa8";
   const activeColor = "#60a5fa";
 
-  const selectTool = (key) => {
-    if (activeTool === key) { setActiveTool(null); setFullscreen(false); }
-    else { setActiveTool(key); setOpen(false); setScale(1); setShowSwitch(false); }
-  };
-  const closeTool = () => { setActiveTool(null); setFullscreen(false); setScale(1); setShowSwitch(false); };
-
   return (
     <>
-      {/* Star button - HIDDEN when a tool is active */}
-      {!activeTool && (
-        <div style={{ position:"fixed", top:16, right:16, zIndex:100 }}>
-          <button onClick={() => setOpen(!open)} style={{
-            width:38, height:38, borderRadius:8, border:`1px solid ${open ? activeColor : "#262c3e"}`,
-            background: open ? "rgba(96,165,250,0.12)" : "rgba(20,24,33,0.9)",
-            cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-            backdropFilter:"blur(8px)", transition:"all 0.2s",
-            boxShadow: open ? `0 0 16px rgba(96,165,250,0.2)` : "0 2px 8px rgba(0,0,0,0.3)",
+      {/* Floating button */}
+      <div style={{ position:"fixed", top:16, right:16, zIndex:100 }}>
+        <button onClick={() => setOpen(!open)} style={{
+          width:38, height:38, borderRadius:8, border:`1px solid ${open ? activeColor : "#262c3e"}`,
+          background: open ? "rgba(96,165,250,0.12)" : "rgba(20,24,33,0.9)",
+          cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+          backdropFilter:"blur(8px)", transition:"all 0.2s",
+          boxShadow: open ? `0 0 16px rgba(96,165,250,0.2)` : "0 2px 8px rgba(0,0,0,0.3)",
+        }}>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L10.5 6H14.5L11.5 8.5L12.5 12.5L9 10L5.5 12.5L6.5 8.5L3.5 6H7.5L9 2Z" stroke={open ? activeColor : iconColor} strokeWidth="1.2" fill={open ? `${activeColor}22` : "none"}/>
+          </svg>
+        </button>
+
+        {/* Dropdown panel */}
+        {open && (
+          <div style={{
+            position:"absolute", top:44, right:0, width:200,
+            background:"rgba(16,19,26,0.95)", border:`1px solid #262c3e`,
+            borderRadius:10, backdropFilter:"blur(12px)",
+            boxShadow:"0 8px 32px rgba(0,0,0,0.5)",
+            padding:"6px 0", animation:"fadeIn 0.2s ease",
           }}>
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M9 2L10.5 6H14.5L11.5 8.5L12.5 12.5L9 10L5.5 12.5L6.5 8.5L3.5 6H7.5L9 2Z" stroke={open ? activeColor : iconColor} strokeWidth="1.2" fill={open ? `${activeColor}22` : "none"}/>
-            </svg>
-          </button>
+            <p style={{ fontSize:9, fontWeight:600, color:"#5a5c66", letterSpacing:1.5, textTransform:"uppercase", margin:"6px 12px 4px", padding:0 }}>Reference Tools</p>
+            {TOOL_LIST.map(tool => {
+              const isActive = activeTool === tool.key;
+              const isMatch = tool.match === activeInteractive;
+              return (
+                <button key={tool.key} onClick={() => { setActiveTool(isActive ? null : tool.key); if(isActive) return; }}
+                  style={{
+                    width:"100%", display:"flex", alignItems:"center", gap:8,
+                    padding:"7px 12px", border:"none", cursor:"pointer",
+                    background: isActive ? "rgba(96,165,250,0.1)" : "transparent",
+                    fontFamily:F.sans, textAlign:"left", transition:"background 0.15s",
+                  }}
+                  onMouseEnter={e => { if(!isActive) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+                  onMouseLeave={e => { if(!isActive) e.currentTarget.style.background = "transparent"; }}
+                >
+                  <span style={{ flexShrink:0, opacity: isActive ? 1 : 0.6 }}>
+                    {TOOL_ICONS[tool.key](isActive ? activeColor : isMatch ? "#8a7a6a" : iconColor)}
+                  </span>
+                  <span style={{
+                    fontSize:11, color: isActive ? activeColor : isMatch ? "#d4d2cb" : "#8a8b93",
+                    fontWeight: isMatch ? 600 : 400,
+                  }}>
+                    {tool.label}
+                    {isMatch && <span style={{ fontSize:8, color:"#8a7a6a", marginLeft:4 }}>*</span>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-          {/* Dropdown list */}
-          {open && (
-            <div style={{
-              position:"absolute", top:44, right:0, width:210,
-              background:"rgba(16,19,26,0.95)", border:`1px solid #262c3e`,
-              borderRadius:10, backdropFilter:"blur(12px)",
-              boxShadow:"0 8px 32px rgba(0,0,0,0.5)",
-              padding:"6px 0", animation:"fadeIn 0.2s ease",
-            }}>
-              <p style={{ fontSize:9, fontWeight:600, color:"#5a5c66", letterSpacing:1.5, textTransform:"uppercase", margin:"6px 12px 4px", padding:0 }}>Reference Tools</p>
-              {TOOL_LIST.map(tool => {
-                const isMatch = tool.match === activeInteractive;
-                return (
-                  <button key={tool.key} onClick={() => selectTool(tool.key)}
-                    style={{
-                      width:"100%", display:"flex", alignItems:"center", gap:8,
-                      padding:"7px 12px", border:"none", cursor:"pointer",
-                      background:"transparent", fontFamily:F.sans, textAlign:"left", transition:"background 0.15s",
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
-                    <span style={{ flexShrink:0, opacity:0.6 }}>
-                      {TOOL_ICONS[tool.key]?.(isMatch ? "#8a7a6a" : iconColor)}
-                    </span>
-                    <span style={{ fontSize:11, color: isMatch ? "#d4d2cb" : "#8a8b93", fontWeight: isMatch ? 600 : 400 }}>
-                      {tool.label}
-                      {isMatch && <span style={{ fontSize:8, color:"#8a7a6a", marginLeft:4 }}>*</span>}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Tool render panel ── */}
+      {/* Tool render panel (slides in below toolbar) */}
       {activeTool && ToolComp && (
         <div style={{
-          position:"fixed",
-          top: fullscreen ? 0 : 16, right: fullscreen ? 0 : 16,
-          left: fullscreen ? 0 : "auto", bottom: fullscreen ? 0 : "auto",
-          width: fullscreen ? "100vw" : "min(520px, calc(100vw - 32px))",
-          maxHeight: fullscreen ? "100vh" : "calc(100vh - 32px)",
-          overflowY:"auto", zIndex:100,
-          background: fullscreen ? "rgba(10,13,20,0.98)" : "rgba(16,19,26,0.95)",
-          border: fullscreen ? "none" : `1px solid #262c3e`,
-          borderRadius: fullscreen ? 0 : 10, backdropFilter:"blur(12px)",
-          boxShadow: fullscreen ? "none" : "0 8px 32px rgba(0,0,0,0.5)",
-          padding: fullscreen ? "16px 20px" : 12,
+          position:"fixed", top:62, right:16, width:"min(480px, calc(100vw - 32px))",
+          maxHeight:"calc(100vh - 80px)", overflowY:"auto", zIndex:99,
+          background:"rgba(16,19,26,0.95)", border:`1px solid #262c3e`,
+          borderRadius:10, backdropFilter:"blur(12px)",
+          boxShadow:"0 8px 32px rgba(0,0,0,0.5)", padding:12,
           animation:"fadeIn 0.25s ease",
         }}>
-          {/* Header bar with all controls */}
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8, gap:6, position:"relative" }}>
-            {/* Left: tool name + switch button */}
-            <div style={{ display:"flex", alignItems:"center", gap:6, minWidth:0 }}>
-              <button onClick={() => setShowSwitch(!showSwitch)} title="Switch tool" style={{
-                background: showSwitch ? "rgba(96,165,250,0.12)" : "none",
-                border:`1px solid ${showSwitch ? activeColor : "#262c3e"}`,
-                borderRadius:4, cursor:"pointer", padding:"3px 5px",
-                display:"flex", alignItems:"center", justifyContent:"center",
-              }}>
-                <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2L10.5 6H14.5L11.5 8.5L12.5 12.5L9 10L5.5 12.5L6.5 8.5L3.5 6H7.5L9 2Z" stroke={showSwitch ? activeColor : iconColor} strokeWidth="1.2" fill="none"/>
-                </svg>
-              </button>
-              <span style={{ fontSize:12, fontWeight:600, color:"#6a7fa8", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                {TOOL_LIST.find(t => t.key === activeTool)?.label}
-              </span>
-            </div>
-            {/* Right: scale + fullscreen + close */}
-            <div style={{ display:"flex", alignItems:"center", gap:5, flexShrink:0 }}>
-              <input type="range" min={0.6} max={1.5} step={0.05} value={scale}
-                onChange={e => setScale(parseFloat(e.target.value))}
-                style={{ width:50, accentColor:"#6a7fa8", height:2, cursor:"pointer" }} />
-              <span style={{ fontSize:8, color:"#5a5c66", fontFamily:F.mono, width:24 }}>{Math.round(scale*100)}%</span>
-              <button onClick={() => setFullscreen(!fullscreen)} title={fullscreen ? "Exit fullscreen" : "Fullscreen"} style={{
-                background:"none", border:`1px solid #262c3e`, borderRadius:4, cursor:"pointer", padding:"3px 5px",
-                display:"flex", alignItems:"center", justifyContent:"center",
-              }}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  {fullscreen ? (
-                    <><path d="M4 1V4H1" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M8 1V4H11" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M4 11V8H1" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M8 11V8H11" stroke="#6a7fa8" strokeWidth="1.2"/></>
-                  ) : (
-                    <><path d="M1 4V1H4" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M11 4V1H8" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M1 8V11H4" stroke="#6a7fa8" strokeWidth="1.2"/><path d="M11 8V11H8" stroke="#6a7fa8" strokeWidth="1.2"/></>
-                  )}
-                </svg>
-              </button>
-              <button onClick={closeTool} style={{
-                background:"none", border:"none", color:"#5a5c66", fontSize:14, cursor:"pointer", padding:"2px 4px",
-              }}>{"\u2715"}</button>
-            </div>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+            <span style={{ fontSize:11, fontWeight:600, color:"#6a7fa8" }}>
+              {TOOL_LIST.find(t => t.key === activeTool)?.label}
+            </span>
+            <button onClick={() => setActiveTool(null)} style={{
+              background:"none", border:"none", color:"#5a5c66", fontSize:14, cursor:"pointer", padding:"2px 6px",
+            }}>{"\u2715"}</button>
           </div>
-
-          {/* Switch tool dropdown (inside panel) */}
-          {showSwitch && (
-            <div style={{
-              marginBottom:8, padding:"6px 0", borderRadius:8,
-              background:"rgba(10,12,18,0.8)", border:`1px solid #262c3e`,
-            }}>
-              {TOOL_LIST.map(tool => {
-                const isActive = activeTool === tool.key;
-                return (
-                  <button key={tool.key} onClick={() => { selectTool(tool.key); setShowSwitch(false); }}
-                    style={{
-                      width:"100%", display:"flex", alignItems:"center", gap:8,
-                      padding:"6px 12px", border:"none", cursor:"pointer",
-                      background: isActive ? "rgba(96,165,250,0.1)" : "transparent",
-                      fontFamily:F.sans, textAlign:"left", fontSize:11,
-                      color: isActive ? activeColor : "#8a8b93",
-                      fontWeight: isActive ? 600 : 400,
-                    }}
-                    onMouseEnter={e => { if(!isActive) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-                    onMouseLeave={e => { if(!isActive) e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <span style={{ flexShrink:0, opacity: isActive ? 1 : 0.6 }}>
-                      {TOOL_ICONS[tool.key]?.(isActive ? activeColor : iconColor)}
-                    </span>
-                    {tool.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Scaled content */}
-          <div style={{ transform:`scale(${scale})`, transformOrigin:"top left", width:`${100/scale}%` }}>
-            <ToolComp />
-          </div>
+          <ToolComp />
         </div>
       )}
     </>
