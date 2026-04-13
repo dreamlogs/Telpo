@@ -22,7 +22,7 @@ const SANS = "'IBM Plex Sans','Inter',system-ui,sans-serif";
 
 // ── Subjects (keep existing storage keys) ──
 const SUBJECTS = [
-  { id: "calc", title: "Calculus I", desc: "32 lectures mapped to Professor Leonard", icon: "\u222B", lectures: 32, storageKey: "Telpo-calc-v1", color: C.calculus, glow: C.calculusGlow },
+  { id: "calc", title: "Calculus I", desc: "MATH 60 \u2014 Stewart 9th Ed \u2014 Zugates", icon: "\u222B", lectures: 30, storageKey: "Telpo-calc-v1", color: C.calculus, glow: C.calculusGlow },
   { id: "physics", title: "Physics", desc: "15 units from mechanics to quantum", icon: "P", lectures: 48, storageKey: "Telpo-physics-v1", color: C.physics, glow: C.physicsGlow },
   { id: "chem", title: "Chem Placement", desc: "5 week plan to place into CHEM 1A", icon: "\u2697", lectures: 23, storageKey: "Telpo-chemplace-v1", color: C.chem, glow: C.chemGlow },
   { id: "cpp", title: "Arduino C++", desc: "Embedded systems and hardware programming", icon: "\u229E", lectures: 20, storageKey: "Telpo-cpp-v1", color: C.code, glow: C.codeGlow },
@@ -82,11 +82,10 @@ const BOSS_Q = {
 // ── Section data for bubble maps ──
 const SECTIONS = {
   calc: [
-    { id: "precalc", label: "Precalc Review", short: "Precalc", lectures: "0.1\u20130.3", count: 3, topics: ["Functions", "Trig Review", "Graphing"], connections: ["limits"], prereqs: [] },
-    { id: "limits", label: "Limits", short: "Limits", lectures: "1.1\u20131.6", count: 6, topics: ["Intuitive Limits", "Limit Laws", "Continuity", "Squeeze Thm", "Limits at \u221E"], connections: ["derivatives"], prereqs: ["precalc"] },
-    { id: "derivatives", label: "Derivatives", short: "Deriv", lectures: "2.1\u20132.8", count: 8, topics: ["Definition", "Power Rule", "Product/Quotient", "Chain Rule", "Implicit", "Related Rates"], connections: ["applications", "integrals"], prereqs: ["limits"] },
-    { id: "applications", label: "Applications", short: "Apps", lectures: "3.1\u20133.5", count: 5, topics: ["Max/Min", "MVT", "Curve Sketching", "Optimization", "L'H\u00F4pital"], connections: ["integrals"], prereqs: ["derivatives"] },
-    { id: "integrals", label: "Integration", short: "Integ", lectures: "4.1\u20135.4", count: 10, topics: ["Antiderivatives", "Riemann Sums", "FTC", "Substitution", "Area Between Curves", "Volumes"], connections: [], prereqs: ["derivatives"] },
+    { id: "calc_ch2", label: "Ch 2: Limits", short: "Limits", lectures: "\u00A72.1\u20132.8", count: 8, topics: ["Tangent/Velocity", "Limit Laws", "Continuity", "Limits at \u221E", "Derivative Intro"], connections: ["calc_ch3"], prereqs: [] },
+    { id: "calc_ch3", label: "Ch 3: Differentiation", short: "Diff Rules", lectures: "\u00A73.1\u20133.10", count: 10, topics: ["Power Rule", "Product/Quotient", "Trig", "Chain Rule", "Implicit", "Related Rates"], connections: ["calc_ch4"], prereqs: ["calc_ch2"] },
+    { id: "calc_ch4", label: "Ch 4: Applications", short: "Apps", lectures: "\u00A74.1\u20134.9", count: 7, topics: ["Max/Min", "MVT", "Curve Sketch", "L\u2019H\u00F4pital", "Optimization", "Antiderivs"], connections: ["calc_ch5"], prereqs: ["calc_ch3"] },
+    { id: "calc_ch5", label: "Ch 5: Integrals", short: "Integrals", lectures: "\u00A75.1\u20135.5", count: 5, topics: ["Riemann Sums", "Definite Integral", "FTC", "Substitution"], connections: [], prereqs: ["calc_ch4"] },
   ],
   physics: [
     { id: "ph_vectors", label: "Vectors", short: "Vectors", lectures: "Unit 1", count: 3, topics: ["Components", "Unit Vectors", "Dot/Cross"], connections: ["ph_1dkin"], prereqs: [] },
@@ -127,11 +126,17 @@ const SECTION_LECTURES = {
   ch_mole: ["m1","m2"], ch_phases: ["ph1","ph2"], ch_lewis: ["lw1","lw2"],
   ch_gas: ["g1","g2"], ch_solutions: ["s1"], ch_equilibrium: ["eq1","eq2"],
   ch_kinetics: ["kn1"], ch_review: ["x1","x2"],
+  // Calc sections -> lecture IDs in calc_lab.jsx
+  calc_ch2: ["2.1","2.2","2.3","2.4","2.5","2.6","2.7","2.8"],
+  calc_ch3: ["3.1","3.2","3.3","3.4","3.5","3.6","3.7","3.8","3.9","3.10"],
+  calc_ch4: ["4.1","4.2","4.3","4.4","4.5","4.7","4.9"],
+  calc_ch5: ["5.1","5.2","5.3","5.4","5.5"],
 };
 const SECTION_TO_UNIT = {
   ch_atomic:"u1", ch_naming:"u2", ch_reactions:"u3", ch_mole:"u4",
   ch_phases:"u7", ch_lewis:"u8", ch_gas:"u5", ch_solutions:"u6",
   ch_equilibrium:"u9", ch_kinetics:"u10", ch_review:"u11",
+  calc_ch2:"ch2", calc_ch3:"ch3a", calc_ch4:"ch4", calc_ch5:"ch5",
 };
 
 function getSectionCompletion(storageKey, sectionId) {
