@@ -430,6 +430,8 @@ export default function Telpo({onBack}){
 
   const l=active,Viz=l?.hasViz?VIZ_MAP[l.vizType]||null:null,s=progress[l?.id];
   const eqs = CALC_EQUATIONS[l?.id] || null;
+  const [showVideo, setShowVideo] = useState(false);
+  const ytId = l?.yt?.match(/[?&]v=([^&]+)/)?.[1] || l?.yt?.match(/youtu\.be\/([^?]+)/)?.[1] || null;
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
@@ -447,6 +449,38 @@ export default function Telpo({onBack}){
           {[{k:"watched",l:"Watched",c:C.gold,bg:C.goldDim},{k:"mastered",l:"Mastered",c:C.done,bg:C.greenDim}].map(v=>(
             <button key={v.k} onClick={()=>toggle(l.id,v.k)} style={{background:s===v.k?v.bg:"transparent",color:s===v.k?v.c:C.textDim,border:`1px solid ${s===v.k?v.c:C.border}`,borderRadius:3,padding:"5px 12px",fontFamily:F.sans,fontSize:11,cursor:"pointer",fontWeight:500}}>{s===v.k?"ok ":""}{v.l}</button>))}
         </div>
+
+        {/* YouTube Player */}
+        {ytId && !showVideo && (
+          <button onClick={()=>setShowVideo(true)} style={{
+            display:"flex", alignItems:"center", gap:8, width:"100%", marginBottom:16,
+            padding:"10px 14px", background:"rgba(154,102,102,0.15)", borderRadius:8, border:"1px solid rgba(154,102,102,0.25)",
+            color:"#9a6666", fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:F.sans,
+          }}>
+            <span style={{ fontSize:16 }}>&#9654;</span>
+            <span>Watch: {l.title}</span>
+            <span style={{ fontSize:10, color:C.textDim, marginLeft:"auto" }}>{l.ytLabel || "Professor Leonard"}</span>
+          </button>
+        )}
+        {ytId && showVideo && (
+          <div style={{ marginBottom:16, borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#000" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 10px", background:C.panel }}>
+              <span style={{ fontSize:10, color:C.textDim, fontWeight:500 }}>{l.ytLabel || "Professor Leonard"}</span>
+              <div style={{ display:"flex", gap:6 }}>
+                <a href={l.yt} target="_blank" rel="noopener noreferrer" style={{ fontSize:10, color:C.blue, textDecoration:"none" }}>Open in YouTube</a>
+                <button onClick={()=>setShowVideo(false)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:12, color:C.textDim, padding:0 }}>{"\u2715"}</button>
+              </div>
+            </div>
+            <div style={{ position:"relative", paddingBottom:"56.25%", height:0 }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", border:"none" }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
 
         {/* Visualization */}
         {Viz?<Viz/>:l.hasViz?<div style={{padding:24,textAlign:"center",background:C.panel,borderRadius:4,border:`1px solid ${C.border}`,marginBottom:16}}><p style={{color:C.textDim,fontSize:11,margin:0}}>Module ready to build. We scope it together when you reach this lecture.</p></div>:null}

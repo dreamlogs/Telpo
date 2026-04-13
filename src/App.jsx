@@ -594,10 +594,21 @@ function BubbleMap({ moduleKey, moduleLabel, color, glow, sections, storageKey, 
 
   const positions = useMemo(() => {
     const pos = {};
-    sections.forEach((s, i) => {
-      const col = i % 3, row = Math.floor(i / 3);
-      pos[s.id] = { x: 0.18 + col * 0.30 + (i % 2 === 0 ? 0.03 : -0.03), y: 0.10 + row * 0.22, r: 30 + Math.min(s.count, 8) * 2 };
-    });
+    const n = sections.length;
+    if (n <= 4) {
+      // Linear horizontal chain for small counts (calc has 4)
+      const cols = Math.min(n, 4);
+      const spacing = 0.8 / Math.max(cols - 1, 1);
+      sections.forEach((s, i) => {
+        pos[s.id] = { x: 0.10 + i * spacing, y: 0.35, r: 30 + Math.min(s.count, 8) * 2 };
+      });
+    } else {
+      // Grid layout for larger counts (chem has 11, physics has 15)
+      sections.forEach((s, i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        pos[s.id] = { x: 0.18 + col * 0.30 + (i % 2 === 0 ? 0.03 : -0.03), y: 0.10 + row * 0.22, r: 30 + Math.min(s.count, 8) * 2 };
+      });
+    }
     return pos;
   }, [sections]);
 
@@ -812,6 +823,13 @@ export default function Telpo() {
 
   // Game state
   const [game, setGame] = useState(loadGame);
+
+  // Force navy background on html/body (prevents white flash)
+  useEffect(() => {
+    document.documentElement.style.background = "#141821";
+    document.body.style.background = "#141821";
+    document.body.style.margin = "0";
+  }, []);
   const updateGame = (updates) => {
     setGame(prev => {
       const next = { ...prev, ...updates };
