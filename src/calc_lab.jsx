@@ -40,7 +40,7 @@ const UNITS = [
       reading:["f is continuous at a if: (1) f(a) exists, (2) lim(x->a) f(x) exists, (3) lim(x->a) f(x) = f(a).","Polynomials are continuous everywhere. Rational functions are continuous on their domain.","Types of discontinuity: removable (hole), jump, infinite (vertical asymptote).","Intermediate Value Theorem: if f is continuous on [a,b] and N is between f(a) and f(b), then there exists c in (a,b) where f(c) = N."],
       practice:[{q:"Is f(x) = (x^2-1)/(x-1) continuous at x=1?",a:"No. f(1) is undefined (0/0). Removable discontinuity."},{q:"Three conditions for continuity at x = a?",a:"1) f(a) defined. 2) lim exists. 3) lim = f(a)"},{q:"f(0)=-2, f(3)=5, f continuous. Must f have a zero on [0,3]?",a:"Yes, by IVT. 0 is between -2 and 5."}] },
     { id:"2.6", title:"Limits at Infinity; Horizontal Asymptotes", stewart:"2.6", week:1, day:"Thu Apr 16",
-      yt:"https://youtube.com/watch?v=UTVEIlkEVY", ytLabel:"Professor Leonard", duration:"1:23:49",
+      yt:"https://youtube.com/watch?v=_UTVEIlkEVY", ytLabel:"Professor Leonard", duration:"1:23:49",
       hasViz:true, vizType:"limits_infinity",
       reading:["lim(x->infinity) f(x) = L means f(x) approaches L as x grows without bound. L is a horizontal asymptote.","For rational functions p(x)/q(x): if degree(p) < degree(q), limit = 0. If equal degrees, limit = ratio of leading coefficients. If degree(p) > degree(q), limit = infinity (no HA).","Divide numerator and denominator by highest power of x in denominator."],
       practice:[{q:"lim(x->inf) (3x^2+1)/(5x^2-2)",a:"Leading coefficients: 3/5"},{q:"lim(x->inf) (2x+1)/(x^3-4)",a:"Degree 1 < degree 3. Limit = 0"},{q:"lim(x->inf) e^(-x)",a:"0. Exponential decay approaches 0."}] },
@@ -385,9 +385,13 @@ const VIZ_MAP={lines:VizLines,functions:VizFunctions,trig:VizTrig,secant_tangent
 // ─── APP ────────────────────────────────────────────────────
 export default function Telpo({onBack}){
   const [view,setView]=useState("map"),[active,setActive]=useState(null),[progress,setProgress]=useState(loadProgress);
+  const [showVideo, setShowVideo] = useState(false);
   useEffect(()=>{saveProgress(progress);},[progress]);
   const toggle=(id,s)=>setProgress(p=>{const n={...p};n[id]===s?delete n[id]:n[id]=s;return n;});
   const total=ALL_LECTURES.length,mastered=Object.values(progress).filter(v=>v==="mastered").length;
+  const l=active, Viz=l?.hasViz?VIZ_MAP[l.vizType]||null:null, s=progress[l?.id];
+  const eqs = l ? (CALC_EQUATIONS[l.id] || null) : null;
+  const ytId = l?.yt?.match(/[?&]v=([^&]+)/)?.[1] || l?.yt?.match(/youtu\.be\/([^?]+)/)?.[1] || null;
 
   if(view==="map")return(
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
@@ -395,7 +399,7 @@ export default function Telpo({onBack}){
         {onBack && <button onClick={onBack} style={{background:"transparent",border:"none",color:"#9298a8",fontFamily:"'Inter',system-ui,sans-serif",fontSize:12,cursor:"pointer",padding:0,marginBottom:12}}>Back to Home</button>}
         <p style={{fontSize:10,fontWeight:600,color:C.silver,letterSpacing:2.5,textTransform:"uppercase",margin:"0 0 4px"}}>Telpo</p>
         <h1 style={{fontSize:24,fontWeight:600,color:C.text,margin:"0 0 6px"}}>Calculus 1</h1>
-        <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>Stewart 9th Ed, Ch 2-5. 25 sections. 4 exams + final. MTWTh 8:00 AM.</p>
+        <p style={{fontSize:12,color:C.textDim,margin:"0 0 14px"}}>Stewart 9th Ed, Ch 2-5. 30 sections. 4 exams + final. MTWTh 8:00 AM.</p>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <div style={{flex:1,height:2,background:C.border,borderRadius:1,overflow:"hidden"}}><div style={{height:"100%",width:`${(mastered/total)*100}%`,background:C.blue,borderRadius:1,transition:"width 0.4s"}}/></div>
           <span style={{fontFamily:F.mono,fontSize:10,color:C.textDim}}>{mastered}/{total}</span>
@@ -405,7 +409,7 @@ export default function Telpo({onBack}){
         <p style={{fontSize:11,fontWeight:600,color:C.textMid,margin:"0 0 2px",letterSpacing:0.3}}>{u.title}</p>
         {u.exam && <p style={{fontSize:9,color:"#8a7a5b",fontFamily:F.mono,margin:"0 0 6px"}}>{u.exam}</p>}
         {u.lectures.map(l=>{const s=progress[l.id];return(
-          <div key={l.id} onClick={()=>{setActive({...l,unitTitle:u.title});setView("lecture");}}
+          <div key={l.id} onClick={()=>{setActive({...l,unitTitle:u.title});setView("lecture");setShowVideo(false);}}
             style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",transition:"background 0.15s"}}
             onMouseEnter={e=>e.currentTarget.style.background=C.panel} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             <span style={{width:20,height:20,borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontFamily:F.mono,fontWeight:600,flexShrink:0,
@@ -418,7 +422,7 @@ export default function Telpo({onBack}){
               <div style={{display:"flex",gap:8,marginTop:1}}>
                 <span style={{fontSize:10,color:C.textLight,fontFamily:F.mono}}>{l.duration}</span>
                 {l.hasViz&&<span style={{fontSize:10,color:C.blue}}>interactive</span>}
-                {l.questions?.length>0&&<span style={{fontSize:10,color:C.textLight}}>{l.questions.length}p</span>}
+                {(l.practice?.length||l.questions?.length)>0&&<span style={{fontSize:10,color:C.textLight}}>{(l.practice||l.questions).length}p</span>}
               </div>
             </div>
             <span style={{color:C.textLight,fontSize:13}}></span>
@@ -427,11 +431,6 @@ export default function Telpo({onBack}){
       <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO v1.1</p>
     </div>
   );
-
-  const l=active,Viz=l?.hasViz?VIZ_MAP[l.vizType]||null:null,s=progress[l?.id];
-  const eqs = CALC_EQUATIONS[l?.id] || null;
-  const [showVideo, setShowVideo] = useState(false);
-  const ytId = l?.yt?.match(/[?&]v=([^&]+)/)?.[1] || l?.yt?.match(/youtu\.be\/([^?]+)/)?.[1] || null;
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,padding:"0 24px",maxWidth:720,margin:"0 auto",fontFamily:F.sans}}>
