@@ -931,6 +931,11 @@ export default function Telpo() {
     </div>
   );
   if (page === "calc") return darkWrap(<CalcLab onBack={goBack} />);
+  if (page.startsWith("calc:")) {
+    const sectionId = page.split(":")[1];
+    const unitId = SECTION_TO_UNIT[sectionId];
+    return darkWrap(<CalcLab onBack={goBack} startUnit={unitId} />);
+  }
   if (page === "physics") return darkWrap(<PhysicsLab onBack={goBack} />);
   if (page === "chem") return darkWrap(<ChemPlacement onBack={goBack} />);
   if (page.startsWith("chem:")) {
@@ -962,7 +967,8 @@ export default function Telpo() {
           <BubbleMap moduleKey="calc" moduleLabel={sub.title} color={sub.color} glow={sub.glow}
             storageKey="Telpo-calc-v1"
             sections={SECTIONS.calc} onBack={() => setPage("home")}
-            onEnterModule={() => setPage("calc")} />
+            onEnterModule={() => setPage("calc")}
+            onEnterSection={(sectionId) => setPage(`calc:${sectionId}`)} />
         </div>
       </div>
     );

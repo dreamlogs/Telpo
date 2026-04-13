@@ -383,10 +383,12 @@ function VizRiemann() {
 const VIZ_MAP={lines:VizLines,functions:VizFunctions,trig:VizTrig,secant_tangent:VizSecantTangent,derivative_def:VizDerivativeDef,riemann:VizRiemann,inc_dec_concavity:VizIncDecConcavity};
 
 // ─── APP ────────────────────────────────────────────────────
-export default function Telpo({onBack}){
-  const [view,setView]=useState("map"),[active,setActive]=useState(null),[progress,setProgress]=useState(loadProgress);
+export default function Telpo({onBack, startUnit}){
+  const [view,setView]=useState(startUnit ? "map" : "map"),[active,setActive]=useState(null),[progress,setProgress]=useState(loadProgress);
   const [showVideo, setShowVideo] = useState(false);
+  const [expandedUnit, setExpandedUnit] = useState(startUnit || null);
   useEffect(()=>{saveProgress(progress);},[progress]);
+  useEffect(()=>{ if(startUnit) setExpandedUnit(startUnit); },[startUnit]);
   const toggle=(id,s)=>setProgress(p=>{const n={...p};n[id]===s?delete n[id]:n[id]=s;return n;});
   const total=ALL_LECTURES.length,mastered=Object.values(progress).filter(v=>v==="mastered").length;
   const l=active, Viz=l?.hasViz?VIZ_MAP[l.vizType]||null:null, s=progress[l?.id];
@@ -405,30 +407,49 @@ export default function Telpo({onBack}){
           <span style={{fontFamily:F.mono,fontSize:10,color:C.textDim}}>{mastered}/{total}</span>
         </div>
       </div>
-      {UNITS.map(u=><div key={u.id} style={{marginBottom:24}}>
-        <p style={{fontSize:11,fontWeight:600,color:C.textMid,margin:"0 0 2px",letterSpacing:0.3}}>{u.title}</p>
-        {u.exam && <p style={{fontSize:9,color:"#8a7a5b",fontFamily:F.mono,margin:"0 0 6px"}}>{u.exam}</p>}
+      {UNITS.map(u=>{
+        const isExpanded = expandedUnit === u.id;
+        const unitMastered = u.lectures.filter(l => progress[l.id] === "mastered").length;
+        const unitTotal = u.lectures.length;
+        return (<div key={u.id} style={{marginBottom:4}}>
+        <button onClick={() => setExpandedUnit(isExpanded ? null : u.id)} style={{
+          width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"10px 12px", background: isExpanded ? C.panel : "transparent",
+          border:`1px solid ${isExpanded ? C.border : "transparent"}`, borderRadius: isExpanded ? "8px 8px 0 0" : 8,
+          cursor:"pointer", fontFamily:F.sans, transition:"background 0.15s",
+        }}>
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            <span style={{fontSize:11,fontWeight:600,color: isExpanded ? C.text : C.textMid,letterSpacing:0.3}}>{u.title}</span>
+            {u.exam && <span style={{fontSize:8,color:"#8a7a5b",fontFamily:F.mono,background:"rgba(138,122,91,0.1)",padding:"2px 6px",borderRadius:3}}>{u.exam}</span>}
+          </div>
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            <span style={{fontSize:10,color: unitMastered === unitTotal && unitTotal > 0 ? C.done : C.textDim, fontFamily:F.mono}}>{unitMastered}/{unitTotal}</span>
+            <span style={{fontSize:10,color:C.textDim,transform: isExpanded ? "rotate(90deg)" : "none", transition:"transform 0.2s"}}>{"\u25B6"}</span>
+          </div>
+        </button>
+        {isExpanded && <div style={{border:`1px solid ${C.border}`, borderTop:"none", borderRadius:"0 0 8px 8px", background:C.bg}}>
         {u.lectures.map(l=>{const s=progress[l.id];return(
           <div key={l.id} onClick={()=>{setActive({...l,unitTitle:u.title});setView("lecture");setShowVideo(false);}}
-            style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",transition:"background 0.15s"}}
+            style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",transition:"background 0.15s"}}
             onMouseEnter={e=>e.currentTarget.style.background=C.panel} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             <span style={{width:20,height:20,borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontFamily:F.mono,fontWeight:600,flexShrink:0,
               background:s==="mastered"?C.greenDim:s==="watched"?C.goldDim:C.panel,
               color:s==="mastered"?C.done:s==="watched"?C.gold:C.textLight,
               border:`1px solid ${s==="mastered"?C.done:s==="watched"?C.gold:C.border}`}}>
-              {s==="mastered"?"ok":l.id}</span>
+              {s==="mastered"?"\u2713":l.stewart||l.id}</span>
             <div style={{flex:1}}>
               <span style={{fontSize:13,color:C.text,fontWeight:450}}>{l.title}</span>
               <div style={{display:"flex",gap:8,marginTop:1}}>
                 <span style={{fontSize:10,color:C.textLight,fontFamily:F.mono}}>{l.duration}</span>
+                {l.day && <span style={{fontSize:9,color:"#8a7a5b",fontFamily:F.mono}}>{l.day}</span>}
                 {l.hasViz&&<span style={{fontSize:10,color:C.blue}}>interactive</span>}
-                {(l.practice?.length||l.questions?.length)>0&&<span style={{fontSize:10,color:C.textLight}}>{(l.practice||l.questions).length}p</span>}
+                {(l.practice?.length||l.questions?.length)>0&&<span style={{fontSize:10,color:C.textLight}}>{(l.practice||l.questions).length}q</span>}
               </div>
             </div>
-            <span style={{color:C.textLight,fontSize:13}}></span>
           </div>);})}
-      </div>)}
-      <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO v1.1</p>
+        </div>}
+      </div>);})}
+      <p style={{textAlign:"center",fontSize:9,color:C.textLight,letterSpacing:1.5,margin:"24px 0 40px"}}>TELPO v1.2</p>
     </div>
   );
 
