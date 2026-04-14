@@ -29,7 +29,13 @@ const UNITS = [
         {q:"P(0.5, 0) is on y = cos(pi*x). Find secant slope PQ with Q at x=0.",a:"m = (cos(0)-0)/(0-0.5) = 1/(-0.5) = -2"},
         {q:"Rock on Mars: y = 10t - 1.86t^2. Avg velocity on [1, 1.5]?",a:"[10(1.5)-1.86(1.5)^2 - (10(1)-1.86(1)^2)] / 0.5 = (10.815-8.14)/0.5 = 5.35 m/s"},
         {q:"Same rock. Estimate instantaneous velocity at t=1.",a:"Approximately 6.28 m/s (limit of avg velocities as interval shrinks to 0)"}
-      ] },
+      ],
+      homework:[
+        {n:"1a",q:"Tank holds 1000 gal, drains in 30 min. Table: t=5,10,15,20,25,30; V=694,444,250,111,28,0. If P=(15,250), find slopes of secant lines for t=5,10,20,25,30."},
+        {n:"1b",q:"Same tank. Estimate the slope of the tangent line at P by averaging two secant slopes."},
+        {n:"3",q:"P(2,-1) on y=1/(1-x). If Q=(x, 1/(1-x)), find secant slopes PQ for x=1.5, 1.9, 1.99, 1.999, 2.5, 2.1, 2.01, 2.001. Guess tangent slope at P. Find tangent line equation."},
+        {n:"5",q:"Bridge 275 ft above river. Pebble falls: y = 275 - 16t^2. (a) Find avg velocity for t=4 lasting 0.1, 0.05, 0.01 sec. (b) Estimate instantaneous velocity at t=4."},
+        {n:"7a",q:"Motorcyclist position: t=0,1,2,3,4,5,6; s=0,4.9,20.6,46.5,79.2,124.8,176.7 (ft). Find avg velocity for each interval: [2,4], [3,4], [4,5], [4,6]."}] },
     { id:"2.2", title:"The Limit of a Function", stewart:"2.2", week:1, day:"Tue Apr 14",
       yt:"https://youtube.com/watch?v=7Q2HwTHcxA0", ytLabel:"The Organic Chemistry Tutor", duration:"18:01",
       hasViz:true, vizType:"limits_intro",
@@ -46,7 +52,19 @@ const UNITS = [
         {q:"Does lim(x->0) sin(1/x) exist?",a:"No. sin(1/x) oscillates between -1 and 1 as x->0, never approaching a single value."},
         {q:"lim(x->a) f(x) = +inf. What is x=a?",a:"A vertical asymptote of the graph of f."},
         {q:"Given a graph: f(0) = 6, lim(x->8-) f(x) = 1, lim(x->8+) f(x) = -3. Find lim(x->0) f(x), f(8), and lim(x->8) f(x).",a:"lim(x->0) = 4 (read from graph approach). f(8) = -1 (point value). lim(x->8) DNE (left and right limits differ)."}
-      ] },
+      ],
+      homework:[
+        {n:"5",q:"Graph of f given. Find: (a) lim(x->1) f(x), (b) lim(x->3-) f(x), (c) lim(x->3+) f(x), (d) lim(x->3) f(x), (e) f(3)."},
+        {n:"7",q:"Graph of g shown. Find a number a such that: (a) lim(x->a) g(x) DNE but g(a) is defined. (b) lim(x->a) g(x) exists but g(a) is not defined. (c) lim from left and right both exist but two-sided limit DNE. (d) lim(x->a+)=g(a) but lim(x->a-)!=g(a)."},
+        {n:"9",q:"Graph of f given. Find: (a) lim(x->-7) f(x), (b) lim(x->-3) f(x), (c) lim(x->0) f(x), (d) lim(x->6-) f(x), (e) lim(x->6+) f(x)."},
+        {n:"15",q:"Sketch the graph of a function f that satisfies: lim(x->1-) f(x)=3, lim(x->1+) f(x)=0, f(1)=2."},
+        {n:"17",q:"Sketch a graph satisfying: lim(x->-1-) f(x)=0, lim(x->-1+) f(x)=1, lim(x->2) f(x)=3, f(-1)=2, f(2)=1."},
+        {n:"29",q:"Determine the infinite limit: lim(x->5+) (x+1)/(x-5)."},
+        {n:"31",q:"Determine the infinite limit: lim(x->2) x^2/(x-2)^2."},
+        {n:"33",q:"Determine the infinite limit: lim(x->1+) ln(sqrt(x)-1)."},
+        {n:"35",q:"Determine the infinite limit: lim(x->(pi/2)+) (1/x)sec(x)."},
+        {n:"37",q:"Determine the infinite limit: lim(x->1) (x^2+2x)/(x^2-2x+1)."},
+        {n:"39",q:"Determine the infinite limit: lim(x->0+) (ln(x^2) - x^(-2))."}] },
     { id:"2.3", title:"Calculating Limits Using Limit Laws", stewart:"2.3", week:1, day:"Tue Apr 14",
       yt:"https://youtube.com/watch?v=fOrOeZA-vdY", ytLabel:"The Organic Chemistry Tutor", duration:"11:22",
       hasViz:true, vizType:"limit_laws",
@@ -64,7 +82,30 @@ const UNITS = [
         {q:"lim(x->2) (2-x)/(sqrt(x+2)-2)",a:"Rationalize: multiply by (sqrt(x+2)+2)/(sqrt(x+2)+2). Get -(x-2)(sqrt(x+2)+2)/(x-2) = -(sqrt(x+2)+2). Sub: -(2+2) = -4"},
         {q:"lim(x->-4) (sqrt(x^2+9)-5)/(x+4)",a:"Rationalize: multiply by (sqrt(x^2+9)+5)/(sqrt(x^2+9)+5). Get (x^2-16)/[(x+4)(sqrt(x^2+9)+5)] = (x-4)/(sqrt(x^2+9)+5). Sub: -8/10 = -4/5"},
         {q:"If 2x <= g(x) <= x^4 - x^2 + 2 for all x, find lim(x->1) g(x).",a:"lim(x->1) 2x = 2. lim(x->1) (x^4-x^2+2) = 2. By Squeeze Theorem, lim g(x) = 2."}
-      ] },
+      ],
+      homework:[
+        {n:"1",q:"Given lim(x->2) f(x)=4, lim(x->2) g(x)=-2, lim(x->2) h(x)=0. Find: (a) lim[f+5g], (b) lim[g]^3, (c) lim sqrt(f), (d) lim 3f(x)/g(x), (e) lim g(x)/h(x), (f) lim g(x)h(x)/f(x)."},
+        {n:"3",q:"lim(x->5) (4x^2-5x). Evaluate and justify each step."},
+        {n:"5",q:"lim(v->2) (v^2+2v)(2v^3-5). Evaluate and justify."},
+        {n:"7",q:"lim(u->-2) sqrt(9-u^3+2u^2). Evaluate and justify."},
+        {n:"9",q:"lim(t->-1) ((2t^5-t^4)/(5t^2+4))^3. Evaluate and justify."},
+        {n:"11",q:"lim(x->-2) (3x-7)."},
+        {n:"13",q:"lim(t->4) (t^2-2t-8)/(t-4)."},
+        {n:"15",q:"lim(x->2) (x^2+5x+4)/(x-2)."},
+        {n:"17",q:"lim(x->-2) (x^2-x-6)/(3x^2+5x-2)."},
+        {n:"19",q:"lim(t->3) (t^3-27)/(t^2-9)."},
+        {n:"21",q:"lim(h->0) ((h-3)^2-9)/h."},
+        {n:"23",q:"lim(h->0) (sqrt(9+h)-3)/h."},
+        {n:"25",q:"lim(x->3) (1/x - 1/3)/(x-3)."},
+        {n:"27",q:"lim(t->0) (sqrt(1+t)-sqrt(1-t))/t."},
+        {n:"29",q:"lim(x->16) (4-sqrt(x))/(16x-x^2)."},
+        {n:"31",q:"lim(t->0) (1/(t*sqrt(1+t)) - 1/t)."},
+        {n:"33",q:"lim(h->0) ((x+h)^3 - x^3)/h."},
+        {n:"39",q:"If 4x-9 <= f(x) <= x^2-4x+7 for x>=0, find lim(x->4) f(x)."},
+        {n:"43",q:"lim(x->-4) (|x+4| - 2x)."},
+        {n:"45",q:"lim(x->0.5-) (2x-1)/(|2x^3-x^2|)."},
+        {n:"47",q:"lim(x->0-) (1/x - 1/|x|)."},
+        {n:"53",q:"Let B(t) = {4-t/2 if t<2, sqrt(t+c) if t>=2}. Find the value of c so that lim(t->2) B(t) exists."}] },
     { id:"2.4", title:"The Precise Definition of a Limit", stewart:"2.4", week:1, day:"Wed Apr 15",
       yt:"https://youtube.com/watch?v=dXkoMscSbTs", ytLabel:"Professor Leonard", duration:"1:46:30",
       hasViz:false,
@@ -81,7 +122,11 @@ const UNITS = [
         {q:"Prove: lim(x->2) (2-3x) = -4.",a:"|(2-3x)-(-4)| = |6-3x| = 3|x-2|. Choose delta = epsilon/3. Then 3|x-2| < 3(epsilon/3) = epsilon."},
         {q:"Prove: lim(x->1) (2x-5) = -3.",a:"|(2x-5)-(-3)| = |2x-2| = 2|x-1|. Choose delta = epsilon/2."},
         {q:"Prove: lim(x->5) (3x/2 - 1/2) = 7.",a:"|(3x/2-1/2)-7| = |3x/2-15/2| = (3/2)|x-5|. Choose delta = 2*epsilon/3."}
-      ] },
+      ],
+      homework:[
+        {n:"15",q:"Prove the statement using the epsilon-delta definition and illustrate with a diagram: lim(x->4) (x/2 - 1) = 1."},
+        {n:"17",q:"Prove: lim(x->-2) (-2x+1) = 5."},
+        {n:"19",q:"Prove: lim(x->9) (1 - x/3) = -2."}] },
     { id:"2.5", title:"Continuity", stewart:"2.5", week:1, day:"Wed Apr 15",
       yt:"https://youtube.com/watch?v=joewRl1CTL8", ytLabel:"The Organic Chemistry Tutor", duration:"22:29",
       hasViz:true, vizType:"continuity",
@@ -96,7 +141,22 @@ const UNITS = [
         {q:"Three conditions for continuity at x = a?",a:"1) f(a) defined. 2) lim(x->a) f(x) exists. 3) lim = f(a). All three required."},
         {q:"f(0) = -2, f(3) = 5, f continuous on [0,3]. Must f have a zero?",a:"Yes, by IVT. 0 is between -2 and 5, so there exists c in (0,3) with f(c) = 0."},
         {q:"g(x) = {x if x<1, 3 if x=1, 2-x^2 if 1<x<=2, x-3 if x>2}. Is g continuous at x=1?",a:"lim(x->1-) = 1, lim(x->1+) = 1, but g(1) = 3. Since lim != g(1), NOT continuous at x=1."}
-      ] },
+      ],
+      homework:[
+        {n:"5",q:"Graph of f given. (a) At what numbers does lim(x->a) f(x) not exist? (b) At what numbers is f not continuous? (c) At what numbers does lim exist but f is not continuous?"},
+        {n:"7",q:"Sketch the graph of a function with: removable discontinuity at -2, infinite discontinuity at 2."},
+        {n:"9",q:"Sketch: discontinuities at 0 and 3, continuous from the right at 0 and from the left at 3."},
+        {n:"13",q:"Show f(x) = 3x^2 + (x+2)^5 is continuous at a=-1 using the definition of continuity."},
+        {n:"15",q:"Show p(v) = 2*sqrt(3v^2+1) is continuous at a=1."},
+        {n:"19",q:"Explain why f(x) = 1/(x+2) is discontinuous at a=-2. Sketch the graph."},
+        {n:"21",q:"f(x) = {x+3 if x<=-1, 2^x if x>-1}. Is f continuous at a=-1? Explain."},
+        {n:"23",q:"f(x) = {cos(x) if x<0, 0 if x=0, 1-x^2 if x>0}. Is f continuous at a=0?"},
+        {n:"25",q:"f(x) = (x-3)/(x^2-9). (a) Show f has a removable discontinuity at x=3. (b) Redefine f(3) to make f continuous."},
+        {n:"35",q:"Use continuity to evaluate: lim(x->2) x*sqrt(20-x^2)."},
+        {n:"37",q:"Use continuity to evaluate: lim(x->1) ln((5-x^2)/(1+x))."},
+        {n:"47",q:"Find the value of c that makes f continuous on (-inf,inf): f(x) = {cx^2+2x if x<2, x^3-cx if x>=2}."},
+        {n:"55",q:"Use IVT to show that -x^3+4x+1=0 has a solution in (-1,0)."},
+        {n:"57",q:"Use IVT to show that e^x = 3-2x has a solution in (0,1)."}] },
     { id:"2.6", title:"Limits at Infinity; Horizontal Asymptotes", stewart:"2.6", week:1, day:"Thu Apr 16",
       yt:"https://youtube.com/watch?v=NmLljBAg82o", ytLabel:"The Organic Chemistry Tutor", duration:"12:58",
       hasViz:true, vizType:"limits_infinity",
@@ -115,7 +175,26 @@ const UNITS = [
         {q:"lim(x->inf) (e^(-x) + 2cos(3x)). Does it exist?",a:"e^(-x)->0 but 2cos(3x) oscillates between -2 and 2 forever. Limit DNE."},
         {q:"lim(x->inf) sin^2(x)/(x^2+1)",a:"0. Since 0 <= sin^2(x) <= 1, we have 0 <= sin^2(x)/(x^2+1) <= 1/(x^2+1) -> 0. By Squeeze Theorem, limit = 0."},
         {q:"lim(x->0+) tan^(-1)(ln x)",a:"As x->0+, ln(x)->-inf. tan^(-1)(-inf) = -pi/2."}
-      ] },
+      ],
+      homework:[
+        {n:"3",q:"Graph of f given. State: (a) lim(x->inf) f(x), (b) lim(x->-inf) f(x), (c) lim(x->1) f(x), (d) lim(x->3) f(x), (e) asymptote equations."},
+        {n:"5",q:"Sketch graph of f satisfying: f(2)=4, f(-2)=-4, lim(x->-inf) f(x)=0, lim(x->inf) f(x)=2."},
+        {n:"7",q:"Sketch f with: lim(x->0) f(x)=inf, lim(x->3-) f(x)=-inf, lim(x->3+) f(x)=inf, lim(x->-inf) f(x)=1, lim(x->inf) f(x)=-1."},
+        {n:"9",q:"Sketch f with: f(0)=0, lim(x->-1) f(x)=-inf, lim(x->-inf) f(x)=-inf, f is odd."},
+        {n:"15",q:"Find the limit or show it DNE: lim(x->inf) (4x+3)/(5x-1)."},
+        {n:"17",q:"lim(t->-inf) (3t^2+t)/(t^3-4t+1)."},
+        {n:"19",q:"lim(r->inf) (r-r^3)/(2-r^2+3r^3)."},
+        {n:"21",q:"lim(x->inf) (4-sqrt(x))/(2+sqrt(x))."},
+        {n:"23",q:"lim(x->inf) sqrt(x+3x^2)/(4x-1)."},
+        {n:"25",q:"lim(x->-inf) sqrt(1+4x^6)/(2-x^3)."},
+        {n:"27",q:"lim(x->-inf) (2x^5-x)/(x^4+3)."},
+        {n:"29",q:"lim(t->inf) (sqrt(25t^2+2) - 5t)."},
+        {n:"31",q:"lim(x->inf) (sqrt(x^2+ax) - sqrt(x^2+bx))."},
+        {n:"33",q:"lim(x->-inf) (x^2+2x^7)."},
+        {n:"35",q:"lim(x->inf) e^(-2x)*cos(x)."},
+        {n:"37",q:"lim(x->inf) (1-e^x)/(1+2e^x)."},
+        {n:"39",q:"lim(x->(pi/2)+) e^(sec(x))."},
+        {n:"41",q:"lim(x->inf) [ln(1+x^2) - ln(1+x)]."}] },
   ]},
   // Week 2: Apr 20-23 | Week 3: Apr 27-30 | Week 4: May 4-7 (Exam 2) | Chapter 3
   { id:"ch3a", title:"Ch 3: Derivatives (Part 1)", exam:"Exam #2 — May 7", lectures:[
@@ -136,7 +215,17 @@ const UNITS = [
         {q:"Rock on Mars: H = 10t-1.86t^2. Find v(2).",a:"v(a) = 10-3.72a. v(2) = 10-7.44 = 2.56 m/s"},
         {q:"If g(5) = -3 and g'(5) = 4, find the tangent line at x=5.",a:"y-(-3) = 4(x-5). y = 4x-23"},
         {q:"If g(x)=x^4-2, find g'(1) and use it for tangent line at (1,-1).",a:"g'(1) = lim(h->0) [(1+h)^4-2-(-1)]/h = 4. Line: y+1=4(x-1)"}
-      ] },
+      ],
+      homework:[
+        {n:"3a",q:"Find the slope of the tangent line to y = x^2+3x at (-1,-2): (i) using Definition 1, (ii) using Equation 2."},
+        {n:"3b",q:"Find an equation of the tangent line in part (a)."},
+        {n:"5",q:"Find an equation of the tangent line to y = 2x^2-5x+1 at (3,4)."},
+        {n:"7",q:"Find an equation of the tangent line to y = (x+2)/(x-3) at (2,-4)."},
+        {n:"11",q:"Cliff diver plunges from 100 ft. Distance: d(t)=16t^2 ft. (a) After how many seconds does the diver hit the water? (b) With what velocity does the diver hit the water?"},
+        {n:"13",q:"Displacement s=1/t^2 (meters, seconds). Find velocity of the particle at times t=a, t=1, t=2, and t=3."},
+        {n:"15",q:"(a) From the position graph of a particle, when is it moving right? Left? Standing still? (b) Draw a graph of the velocity function."},
+        {n:"27",q:"Find an equation of the tangent line to y=B(x) at x=6 if B(6)=0 and B\'(6) = -1/2."},
+        {n:"29",q:"If f(x) = 3x^2 - x^3, find f\'(1) and use it to find the tangent line to y=3x^2-x^3 at (1,2)."}] },
     { id:"2.8", title:"The Derivative as a Function", stewart:"2.8", week:2, day:"Tue Apr 21",
       yt:"https://youtube.com/watch?v=-aTLjoDT1GQ", ytLabel:"The Organic Chemistry Tutor", duration:"26:44",
       hasViz:true, vizType:"derivative_def",
@@ -155,7 +244,18 @@ const UNITS = [
         {q:"Find f'(x) for F(v) = v/(v+2) using definition.",a:"lim(h->0) [(x+h)/(x+h+2) - x/(x+2)]/h = 2/(x+2)^2"},
         {q:"Is |x| differentiable at x=0?",a:"No. Sharp corner. Left derivative = -1, right derivative = +1. They disagree."},
         {q:"f(x) = x^3-3x. Find f'(x) and f''(x).",a:"f'(x) = 3x^2-3. f''(x) = 6x."}
-      ] },
+      ],
+      homework:[
+        {n:"3",q:"Match each function graph (a)-(d) with the graph of its derivative I-IV. Give reasons."},
+        {n:"21",q:"Find the derivative using the definition. State the domain of f and f\'. f(x) = 3x - 8."},
+        {n:"23",q:"f(t) = 2.5t^2 + 6t. Find f\'(t) from definition, state domains."},
+        {n:"25",q:"A(p) = 4p^3 + 3p. Find A\'(p) from definition, state domains."},
+        {n:"27",q:"f(x) = 1/(x^2-4). Find f\'(x) from definition, state domains."},
+        {n:"29",q:"g(u) = (u+1)/(4u-1). Find g\'(u) from definition, state domains."},
+        {n:"31",q:"f(x) = 1/sqrt(1+x). Find f\'(x) from definition, state domains."},
+        {n:"41",q:"Graph of f given. State, with reasons, the numbers at which f is not differentiable."},
+        {n:"43",q:"Graph of f given. State, with reasons, the numbers at which f is not differentiable."},
+        {n:"53",q:"f(x) = x^3 - 3x. Find f\'(x) and f\'\'(x). Graph f, f\', and f\'\' and check if answers are reasonable."}] },
     { id:"3.1", title:"Derivatives of Polynomials and Exponential Functions", stewart:"3.1", week:2, day:"Wed Apr 22",
       yt:"https://youtube.com/watch?v=9Yz-RCdS2Tg", ytLabel:"The Organic Chemistry Tutor", duration:"10:07",
       hasViz:true, vizType:"diff_rules",
@@ -486,6 +586,7 @@ export default function Telpo({onBack, startUnit}){
   const [view,setView]=useState(startUnit ? "map" : "map"),[active,setActive]=useState(null),[progress,setProgress]=useState(loadProgress);
   const [showVideo, setShowVideo] = useState(false);
   const [expandedUnit, setExpandedUnit] = useState(startUnit || null);
+  const [showHW, setShowHW] = useState(false);
   useEffect(()=>{saveProgress(progress);},[progress]);
   useEffect(()=>{ if(startUnit) setExpandedUnit(startUnit); },[startUnit]);
   const toggle=(id,s)=>setProgress(p=>{const n={...p};n[id]===s?delete n[id]:n[id]=s;return n;});
@@ -528,7 +629,7 @@ export default function Telpo({onBack, startUnit}){
         </button>
         {isExpanded && <div style={{border:`1px solid ${C.border}`, borderTop:"none", borderRadius:"0 0 8px 8px", background:C.bg}}>
         {u.lectures.map(l=>{const s=progress[l.id];return(
-          <div key={l.id} onClick={()=>{setActive({...l,unitTitle:u.title});setView("lecture");setShowVideo(false);}}
+          <div key={l.id} onClick={()=>{setActive({...l,unitTitle:u.title});setView("lecture");setShowVideo(false);setShowHW(false);}}
             style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",transition:"background 0.15s"}}
             onMouseEnter={e=>e.currentTarget.style.background=C.panel} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             <span style={{width:20,height:20,borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontFamily:F.mono,fontWeight:600,flexShrink:0,
@@ -543,6 +644,7 @@ export default function Telpo({onBack, startUnit}){
                 {l.day && <span style={{fontSize:9,color:"#8a7a5b",fontFamily:F.mono}}>{l.day}</span>}
                 {l.hasViz&&<span style={{fontSize:10,color:C.blue}}>interactive</span>}
                 {(l.practice?.length||l.questions?.length)>0&&<span style={{fontSize:10,color:C.textLight}}>{(l.practice||l.questions).length}q</span>}
+                {l.homework?.length>0&&<span style={{fontSize:10,color:"#c4a44e"}}>{l.homework.length}hw</span>}
               </div>
             </div>
           </div>);})}
@@ -616,6 +718,34 @@ export default function Telpo({onBack, startUnit}){
         )}
         {/* Typed answer practice */}
         <Practice questions={l.practice || l.questions} storageId={l.id}/>
+
+        {/* Homework Problems (from Stewart textbook) */}
+        {l.homework && l.homework.length > 0 && (
+          <div style={{marginTop:16, marginBottom:16}}>
+            <button onClick={()=>setShowHW(!showHW)} style={{
+              width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between",
+              padding:"10px 12px", background:"rgba(138,122,91,0.08)", border:"1px solid rgba(138,122,91,0.2)",
+              borderRadius:showHW?"8px 8px 0 0":"8px", cursor:"pointer", fontFamily:F.sans,
+            }}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:12,fontWeight:600,color:"#c4a44e",letterSpacing:0.5}}>HOMEWORK</span>
+                <span style={{fontSize:10,color:C.textDim}}>Stewart {l.stewart} ({l.homework.length} problems)</span>
+              </div>
+              <span style={{fontSize:10,color:C.textDim,transform:showHW?"rotate(90deg)":"none",transition:"transform 0.2s"}}>{"\u25B6"}</span>
+            </button>
+            {showHW && (
+              <div style={{border:"1px solid rgba(138,122,91,0.2)",borderTop:"none",borderRadius:"0 0 8px 8px",padding:"8px 0",background:"rgba(138,122,91,0.03)"}}>
+                <p style={{fontSize:9,color:"#8a7a5b",padding:"4px 12px",margin:"0 0 4px",fontFamily:F.mono}}>Due Thu Apr 23 in class. Work these on paper from textbook.</p>
+                {l.homework.map((h,i) => (
+                  <div key={i} style={{display:"flex",gap:8,padding:"6px 12px",borderBottom:i<l.homework.length-1?`1px solid ${C.border}`:"none"}}>
+                    <span style={{fontSize:11,fontWeight:600,color:"#c4a44e",fontFamily:F.mono,minWidth:32,flexShrink:0}}>#{h.n}</span>
+                    <span style={{fontSize:11,color:C.textMid,lineHeight:1.6}}>{h.q}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{background:C.panel,borderRadius:4,border:`1px solid ${C.border}`,padding:"12px 14px",margin:"16px 0 40px"}}>
           <p style={{fontSize:10,fontWeight:600,color:C.textDim,letterSpacing:1,textTransform:"uppercase",margin:"0 0 4px"}}>Mastery check</p>
