@@ -82,8 +82,8 @@ const BOSS_Q = {
 // ── Section data for bubble maps ──
 const SECTIONS = {
   calc: [
-    { id: "calc_ch2", label: "Ch 2: Limits", short: "Limits", lectures: "\u00A72.1\u20132.8", count: 8, topics: ["Tangent/Velocity", "Limit Laws", "Continuity", "Limits at \u221E", "Derivative Intro"], connections: ["calc_ch3"], prereqs: [] },
-    { id: "calc_ch3", label: "Ch 3: Differentiation", short: "Diff Rules", lectures: "\u00A73.1\u20133.10", count: 10, topics: ["Power Rule", "Product/Quotient", "Trig", "Chain Rule", "Implicit", "Related Rates"], connections: ["calc_ch4"], prereqs: ["calc_ch2"] },
+    { id: "calc_ch2", label: "Ch 2: Limits", short: "Limits", lectures: "\u00A72.1\u20132.6", count: 6, topics: ["Tangent/Velocity", "Limit Laws", "Epsilon-Delta", "Continuity", "Limits at \u221E"], connections: ["calc_ch3"], prereqs: [] },
+    { id: "calc_ch3", label: "Ch 3: Differentiation", short: "Diff Rules", lectures: "\u00A72.7\u20133.10", count: 12, topics: ["Derivative Def", "Power Rule", "Product/Quotient", "Chain Rule", "Implicit", "Related Rates"], connections: ["calc_ch4"], prereqs: ["calc_ch2"] },
     { id: "calc_ch4", label: "Ch 4: Applications", short: "Apps", lectures: "\u00A74.1\u20134.9", count: 7, topics: ["Max/Min", "MVT", "Curve Sketch", "L\u2019H\u00F4pital", "Optimization", "Antiderivs"], connections: ["calc_ch5"], prereqs: ["calc_ch3"] },
     { id: "calc_ch5", label: "Ch 5: Integrals", short: "Integrals", lectures: "\u00A75.1\u20135.5", count: 5, topics: ["Riemann Sums", "Definite Integral", "FTC", "Substitution"], connections: [], prereqs: ["calc_ch4"] },
   ],
