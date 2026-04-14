@@ -17,46 +17,181 @@ const UNITS = [
     { id:"2.1", title:"The Tangent and Velocity Problems", stewart:"2.1", week:1, day:"Mon Apr 13",
       yt:"https://youtube.com/watch?v=VSqOZNULRjQ", ytLabel:"Professor Leonard", duration:"1:27:26",
       hasViz:true, vizType:"secant_tangent",
-      reading:["The tangent problem asks: what is the slope of the curve at a single point? We can\'t use the usual slope formula because we need two points. The key idea is to use a secant line (through two points on the curve) and bring the second point closer and closer to the first.","The velocity problem is the same idea applied to motion. Average velocity = distance/time over an interval. Instantaneous velocity = the limit of average velocity as the time interval shrinks to zero.","Both problems lead to the same mathematical concept: the limit. This chapter introduces limits as the foundation of all calculus."],
-      practice:[{q:"A ball\'s position is s(t) = t^2. Find avg velocity from t=1 to t=2.",a:"(s(2)-s(1))/(2-1) = (4-1)/1 = 3 m/s"},{q:"Same ball. Avg velocity from t=1 to t=1.1?",a:"(1.21-1)/0.1 = 2.1 m/s. Getting closer to instantaneous velocity at t=1"},{q:"What does the tangent line represent on a position graph?",a:"Instantaneous velocity at that point"}] },
+      reading:[
+        "A tangent to a curve is a line that touches the curve at one point. A secant intersects the curve at two or more points.",
+        "Average velocity = change in position / time elapsed = slope of the secant line. Instantaneous velocity = slope of the tangent line = limit of average velocities as the interval shrinks.",
+        "Our goal in this section is to estimate the slope of the tangent line at a particular point by computing secant slopes with the second point getting closer and closer.",
+        "Key formula: m_sec = [f(x) - f(a)] / (x - a). As x approaches a, m_sec approaches m_tan."
+      ],
+      practice:[
+        {q:"A smartwatch records steps: t=0: 3438, t=10: 4559, t=20: 5622, t=30: 6536, t=40: 7398. Find the avg walking pace (steps/min) on [0,40].",a:"(7398-3438)/(40-0) = 3960/40 = 99 steps/min"},
+        {q:"Same data. Estimate the pace at t=20 by averaging slopes on [10,20] and [20,30].",a:"[10,20]: (5622-4559)/10 = 106.3. [20,30]: (6536-5622)/10 = 91.4. Average: (106.3+91.4)/2 = 98.85 steps/min"},
+        {q:"P(0.5, 0) is on y = cos(pi*x). Find secant slope PQ with Q at x=0.",a:"m = (cos(0)-0)/(0-0.5) = 1/(-0.5) = -2"},
+        {q:"Rock on Mars: y = 10t - 1.86t^2. Avg velocity on [1, 1.5]?",a:"[10(1.5)-1.86(1.5)^2 - (10(1)-1.86(1)^2)] / 0.5 = (10.815-8.14)/0.5 = 5.35 m/s"},
+        {q:"Same rock. Estimate instantaneous velocity at t=1.",a:"Approximately 6.28 m/s (limit of avg velocities as interval shrinks to 0)"}
+      ] },
     { id:"2.2", title:"The Limit of a Function", stewart:"2.2", week:1, day:"Tue Apr 14",
       yt:"https://youtube.com/watch?v=VSqOZNULRjQ", ytLabel:"Professor Leonard", duration:"1:27:26",
       hasViz:true, vizType:"limits_intro",
-      reading:["lim(x->a) f(x) = L means as x gets close to a (but not equal), f(x) gets close to L.","The limit may exist even if f(a) is undefined (hole in the graph).","One-sided limits: lim from the left (x->a-) and lim from the right (x->a+). The two-sided limit exists only if both one-sided limits are equal.","If left and right limits disagree, we say the limit Does Not Exist (DNE)."],
-      practice:[{q:"Evaluate lim(x->3) (x^2-9)/(x-3).",a:"Factor: (x-3)(x+3)/(x-3) = x+3. Limit = 6"},{q:"Does lim(x->0) |x|/x exist?",a:"From left: -1. From right: +1. DNE."},{q:"lim(x->2) 5 = ?",a:"5. Limit of a constant is that constant."}] },
+      reading:[
+        "Open intervals (a,b) do NOT contain their endpoints. Closed intervals [a,b] contain their endpoints.",
+        "lim(x->a) f(x) = L if the values of f(x) approach L as x approaches a from both sides, but does NOT require f(a) = L or even that f(a) exists.",
+        "A limit only exists if f(x) approaches the same value from both sides. lim sin(1/x) as x->0 DNE because f(x) oscillates wildly.",
+        "One-sided limits: lim(x->a-) is the left-hand limit (x approaches from negative side). lim(x->a+) is the right-hand limit. The two-sided limit exists iff both one-sided limits are equal.",
+        "Infinite limits: lim f(x) = +inf means values get arbitrarily large positive. lim f(x) = -inf means arbitrarily large negative. The vertical line x=a is a vertical asymptote if at least one of the 6 one-sided infinite limit cases holds."
+      ],
+      practice:[
+        {q:"From a graph: f(2) = 4 but lim(x->2-) f(x) = 2 and lim(x->2+) f(x) = 2. What is lim(x->2) f(x)?",a:"2. The limit is 2 (both sides agree), even though f(2) = 4. The function value at the point does not matter for the limit."},
+        {q:"lim(x->3-) f(x) = 4 and lim(x->3+) f(x) = 2. Does lim(x->3) f(x) exist?",a:"DNE. Left and right limits disagree."},
+        {q:"Does lim(x->0) sin(1/x) exist?",a:"No. sin(1/x) oscillates between -1 and 1 as x->0, never approaching a single value."},
+        {q:"lim(x->a) f(x) = +inf. What is x=a?",a:"A vertical asymptote of the graph of f."},
+        {q:"Given a graph: f(0) = 6, lim(x->8-) f(x) = 1, lim(x->8+) f(x) = -3. Find lim(x->0) f(x), f(8), and lim(x->8) f(x).",a:"lim(x->0) = 4 (read from graph approach). f(8) = -1 (point value). lim(x->8) DNE (left and right limits differ)."}
+      ] },
     { id:"2.3", title:"Calculating Limits Using Limit Laws", stewart:"2.3", week:1, day:"Tue Apr 14",
       yt:"https://youtube.com/watch?v=xMlGkMEfKtY", ytLabel:"Professor Leonard", duration:"3:00:15",
       hasViz:true, vizType:"limit_laws",
-      reading:["Limit laws let you break complex limits into simpler pieces: sum, difference, product, quotient, power.","Direct substitution works for polynomials and rational functions (when denominator is not 0).","When substitution gives 0/0, you need algebraic tricks: factor and cancel, rationalize (multiply by conjugate), or simplify complex fractions.","Squeeze Theorem: if g(x) <= f(x) <= h(x) and lim g = lim h = L, then lim f = L."],
-      practice:[{q:"lim(x->5) (2x^2 - 3x + 1)",a:"Direct sub: 2(25)-15+1 = 36"},{q:"lim(x->0) sin(x)/x",a:"1 (Squeeze Theorem result, must memorize)"},{q:"lim(x->4) (sqrt(x)-2)/(x-4)",a:"Rationalize: multiply by (sqrt(x)+2)/(sqrt(x)+2). Get 1/(sqrt(x)+2). Sub x=4: 1/4"}] },
+      reading:[
+        "7 Limit Laws: (1) Sum: lim[f+g] = lim f + lim g. (2) Difference. (3) Constant multiple: lim[cf] = c*lim f. (4) Product: lim[fg] = lim f * lim g. (5) Quotient (denom != 0). (6) Power: lim[f^n] = (lim f)^n. (7) Root: lim[nth root of f] = nth root of lim f.",
+        "Direct Substitution: if f is a polynomial or rational function and a is in the domain, then lim(x->a) f(x) = f(a). Just plug in.",
+        "When direct substitution gives 0/0, it is indeterminate. Use algebra: factor and cancel, rationalize (multiply by conjugate for roots), simplify complex fractions, or find a common denominator.",
+        "If f(x) = g(x) for all x != a, then lim f = lim g (provided limits exist). This justifies canceling common factors.",
+        "Squeeze Theorem: if f(x) <= g(x) <= h(x) near a and lim f = lim h = L, then lim g = L."
+      ],
+      practice:[
+        {q:"lim(x->-3) (2x^3 + 6x^2 - 9)",a:"Direct sub: 2(-27)+6(9)-9 = -54+54-9 = -9"},
+        {q:"lim(x->-3) (x^2+3x)/(x^2-x-12)",a:"Factor: x(x+3)/[(x-4)(x+3)] = x/(x-4). Sub: -3/(-7) = 3/7"},
+        {q:"lim(x->-5) (2x^2+9x-5)/(x^2-25)",a:"Factor: (2x-1)(x+5)/[(x-5)(x+5)] = (2x-1)/(x-5). Sub: (-11)/(-10) = 11/10"},
+        {q:"lim(x->2) (2-x)/(sqrt(x+2)-2)",a:"Rationalize: multiply by (sqrt(x+2)+2)/(sqrt(x+2)+2). Get -(x-2)(sqrt(x+2)+2)/(x-2) = -(sqrt(x+2)+2). Sub: -(2+2) = -4"},
+        {q:"lim(x->-4) (sqrt(x^2+9)-5)/(x+4)",a:"Rationalize: multiply by (sqrt(x^2+9)+5)/(sqrt(x^2+9)+5). Get (x^2-16)/[(x+4)(sqrt(x^2+9)+5)] = (x-4)/(sqrt(x^2+9)+5). Sub: -8/10 = -4/5"},
+        {q:"If 2x <= g(x) <= x^4 - x^2 + 2 for all x, find lim(x->1) g(x).",a:"lim(x->1) 2x = 2. lim(x->1) (x^4-x^2+2) = 2. By Squeeze Theorem, lim g(x) = 2."}
+      ] },
     { id:"2.4", title:"The Precise Definition of a Limit", stewart:"2.4", week:1, day:"Wed Apr 15",
       yt:"https://youtube.com/watch?v=dXkoMscSbTs", ytLabel:"Professor Leonard", duration:"1:46:30",
       hasViz:false,
-      reading:["Epsilon-delta definition: lim(x->a) f(x) = L means for every epsilon > 0, there exists delta > 0 such that if 0 < |x-a| < delta then |f(x)-L| < epsilon.","This is the rigorous foundation. Your instructor may not test heavily on proofs but understanding the concept matters.","Think of it as: you pick how close f(x) must be to L (epsilon), and I find how close x must be to a (delta) to guarantee it."],
-      practice:[{q:"In epsilon-delta, what does epsilon represent?",a:"How close f(x) must be to L (the tolerance on the output)"},{q:"What does delta represent?",a:"How close x must be to a (the tolerance on the input)"}] },
+      reading:[
+        "Greek lowercase letters: delta (the input tolerance) and epsilon (the output tolerance).",
+        "Precise definition: lim(x->a) f(x) = L means for every number epsilon > 0, there exists a number delta > 0 such that if 0 < |x-a| < delta, then |f(x)-L| < epsilon.",
+        "The distance from x to a is |x-a|. The distance from f(x) to L is |f(x)-L|. The definition says: no matter how small you make epsilon (the output tolerance), I can find a delta (input tolerance) that works.",
+        "To prove a limit: (1) Start with |f(x)-L| < epsilon. (2) Simplify to get |x-a| < something. (3) Choose delta = that something. (4) Write the formal proof showing if 0 < |x-a| < delta then |f(x)-L| < epsilon.",
+        "For linear functions f(x) = mx + b, delta = epsilon/|m| always works."
+      ],
+      practice:[
+        {q:"For f(x) = 2x+3, find delta such that |f(x)-5| < 0.01 when 0 < |x-1| < delta.",a:"|2x+3-5| = |2x-2| = 2|x-1| < 0.01. So |x-1| < 0.005. delta = 0.005"},
+        {q:"Prove: lim(x->1) (2x+3) = 5.",a:"Given epsilon > 0, choose delta = epsilon/2. If 0 < |x-1| < delta, then |2x+3-5| = 2|x-1| < 2(epsilon/2) = epsilon."},
+        {q:"Prove: lim(x->2) (2-3x) = -4.",a:"|(2-3x)-(-4)| = |6-3x| = 3|x-2|. Choose delta = epsilon/3. Then 3|x-2| < 3(epsilon/3) = epsilon."},
+        {q:"Prove: lim(x->1) (2x-5) = -3.",a:"|(2x-5)-(-3)| = |2x-2| = 2|x-1|. Choose delta = epsilon/2."},
+        {q:"Prove: lim(x->5) (3x/2 - 1/2) = 7.",a:"|(3x/2-1/2)-7| = |3x/2-15/2| = (3/2)|x-5|. Choose delta = 2*epsilon/3."}
+      ] },
     { id:"2.5", title:"Continuity", stewart:"2.5", week:1, day:"Wed Apr 15",
       yt:"https://youtube.com/watch?v=joewRl1CTL8", ytLabel:"Professor Leonard", duration:"1:26:51",
       hasViz:true, vizType:"continuity",
-      reading:["f is continuous at a if: (1) f(a) exists, (2) lim(x->a) f(x) exists, (3) lim(x->a) f(x) = f(a).","Polynomials are continuous everywhere. Rational functions are continuous on their domain.","Types of discontinuity: removable (hole), jump, infinite (vertical asymptote).","Intermediate Value Theorem: if f is continuous on [a,b] and N is between f(a) and f(b), then there exists c in (a,b) where f(c) = N."],
-      practice:[{q:"Is f(x) = (x^2-1)/(x-1) continuous at x=1?",a:"No. f(1) is undefined (0/0). Removable discontinuity."},{q:"Three conditions for continuity at x = a?",a:"1) f(a) defined. 2) lim exists. 3) lim = f(a)"},{q:"f(0)=-2, f(3)=5, f continuous. Must f have a zero on [0,3]?",a:"Yes, by IVT. 0 is between -2 and 5."}] },
+      reading:[
+        "f is continuous at a if three conditions hold: (1) f(a) is defined, (2) lim(x->a) f(x) exists, (3) lim(x->a) f(x) = f(a). All three must be true.",
+        "Polynomials are continuous everywhere. Rational functions are continuous on their domain. Trig, exponential, and root functions are continuous on their domains.",
+        "Types of discontinuity: removable (hole, limit exists but f(a) is wrong or missing), jump (left and right limits differ), infinite (vertical asymptote).",
+        "Intermediate Value Theorem: if f is continuous on [a,b] and N is between f(a) and f(b), then there exists c in (a,b) where f(c) = N. Used to prove roots exist."
+      ],
+      practice:[
+        {q:"Is f(x) = (x^2-1)/(x-1) continuous at x=1?",a:"No. f(1) is undefined (0/0). Removable discontinuity. The limit is 2 but f(1) DNE."},
+        {q:"Three conditions for continuity at x = a?",a:"1) f(a) defined. 2) lim(x->a) f(x) exists. 3) lim = f(a). All three required."},
+        {q:"f(0) = -2, f(3) = 5, f continuous on [0,3]. Must f have a zero?",a:"Yes, by IVT. 0 is between -2 and 5, so there exists c in (0,3) with f(c) = 0."},
+        {q:"g(x) = {x if x<1, 3 if x=1, 2-x^2 if 1<x<=2, x-3 if x>2}. Is g continuous at x=1?",a:"lim(x->1-) = 1, lim(x->1+) = 1, but g(1) = 3. Since lim != g(1), NOT continuous at x=1."}
+      ] },
     { id:"2.6", title:"Limits at Infinity; Horizontal Asymptotes", stewart:"2.6", week:1, day:"Thu Apr 16",
       yt:"https://youtube.com/watch?v=_UTVEIlkEVY", ytLabel:"Professor Leonard", duration:"1:23:49",
       hasViz:true, vizType:"limits_infinity",
-      reading:["lim(x->infinity) f(x) = L means f(x) approaches L as x grows without bound. L is a horizontal asymptote.","For rational functions p(x)/q(x): if degree(p) < degree(q), limit = 0. If equal degrees, limit = ratio of leading coefficients. If degree(p) > degree(q), limit = infinity (no HA).","Divide numerator and denominator by highest power of x in denominator."],
-      practice:[{q:"lim(x->inf) (3x^2+1)/(5x^2-2)",a:"Leading coefficients: 3/5"},{q:"lim(x->inf) (2x+1)/(x^3-4)",a:"Degree 1 < degree 3. Limit = 0"},{q:"lim(x->inf) e^(-x)",a:"0. Exponential decay approaches 0."}] },
+      reading:[
+        "lim(x->+inf) f(x) = L means f(x) approaches L as x grows without bound. The line y=L is a horizontal asymptote.",
+        "For rational functions, use dominant terms (highest power in numerator and denominator). Divide top and bottom by x^(highest power in denominator). Terms like 1/x, 1/x^2 go to 0.",
+        "Degree comparison shortcut: if deg(top) < deg(bottom), limit = 0. Equal degrees: ratio of leading coefficients. deg(top) > deg(bottom): limit = +/- infinity.",
+        "Theorem: if r > 0 is rational, then lim(x->+inf) 1/x^r = 0. Also lim(x->-inf) 1/x^r = 0 (when x^r is defined).",
+        "Exponential limits: for b > 1, lim(x->inf) b^x = inf and lim(x->inf) b^(-x) = 0. For e^x: lim(x->-inf) e^x = 0 and lim(x->inf) e^x = inf. lim(x->inf) e^(-x) = 0.",
+        "lim(x->-inf) tan^(-1)(x) = -pi/2. lim(x->+inf) tan^(-1)(x) = pi/2."
+      ],
+      practice:[
+        {q:"lim(x->inf) (-2)/(3x+7)",a:"0. Constant over growing denominator."},
+        {q:"lim(t->-inf) (6t^2+t-5)/(9-2t^2)",a:"Divide by t^2: (6+1/t-5/t^2)/(-2+9/t^2). As t->-inf: 6/(-2) = -3"},
+        {q:"lim(x->inf) (e^3x - e^(-3x))/(e^3x + e^(-3x))",a:"Divide by e^3x: (1 - e^(-6x))/(1 + e^(-6x)). As x->inf, e^(-6x)->0. Answer: 1"},
+        {q:"lim(x->inf) (e^(-x) + 2cos(3x)). Does it exist?",a:"e^(-x)->0 but 2cos(3x) oscillates between -2 and 2 forever. Limit DNE."},
+        {q:"lim(x->inf) sin^2(x)/(x^2+1)",a:"0. Since 0 <= sin^2(x) <= 1, we have 0 <= sin^2(x)/(x^2+1) <= 1/(x^2+1) -> 0. By Squeeze Theorem, limit = 0."},
+        {q:"lim(x->0+) tan^(-1)(ln x)",a:"As x->0+, ln(x)->-inf. tan^(-1)(-inf) = -pi/2."}
+      ] },
+    { id:"2.7", title:"Derivatives and Rates of Change", stewart:"2.7", week:2, day:"Mon Apr 20",
+      yt:"https://youtube.com/watch?v=tEVJNIhWNEg", ytLabel:"Professor Leonard", duration:"1:50:43",
+      hasViz:true, vizType:"derivative_def",
+      reading:[
+        "The derivative of f at a, written f'(a), is the slope of the tangent line to y=f(x) at x=a.",
+        "Definition 1: f'(a) = lim(x->a) [f(x)-f(a)]/(x-a). Definition 2: f'(a) = lim(h->0) [f(a+h)-f(a)]/h. Both are equivalent.",
+        "The tangent line to y=f(x) at point (a, f(a)) has equation: y - f(a) = f'(a)(x - a).",
+        "Delta notation: the average rate of change of y with respect to x over [x1, x2] is delta_y/delta_x = [f(x2)-f(x1)]/(x2-x1). The derivative f'(a) is the instantaneous rate of change.",
+        "Velocity: if position is s(t), then v(a) = s'(a) = lim(h->0) [s(a+h)-s(a)]/h."
+      ],
+      practice:[
+        {q:"Find the slope of the tangent to y=x^3+1 at (1,2) using Def 1: m = lim(x->a) [f(x)-f(a)]/(x-a).",a:"lim(x->1) (x^3+1-2)/(x-1) = lim (x^3-1)/(x-1) = lim (x-1)(x^2+x+1)/(x-1) = 3"},
+        {q:"Find the tangent line equation from the previous problem.",a:"m=3, point (1,2). y-2 = 3(x-1). y = 3x-1"},
+        {q:"Find tangent line to y = x^2 - 2x^3 at (1,-1).",a:"f'(1) = lim(h->0) [(1+h)^2-2(1+h)^3-(-1)]/h. Expand and simplify to get f'(1) = -4. Line: y+1 = -4(x-1)."},
+        {q:"y = sqrt(1-3x). Find tangent line at (-1,2) using Def 2.",a:"m = lim(h->0) [sqrt(4-3h)-2]/h. Rationalize: (4-3h-4)/[h(sqrt(4-3h)+2)] = -3/(sqrt(4-3h)+2). At h=0: -3/4. Line: y-2 = (-3/4)(x+1)"},
+        {q:"Rock on Mars: H = 10t - 1.86t^2. Find velocity at t=2.",a:"v(2) = lim(h->0) [10(2+h)-1.86(2+h)^2 - (20-7.44)]/h = 10-7.44 = 2.56 m/s (using v(a) = 10-3.72a)"}
+      ] },
+    { id:"2.8", title:"The Derivative as a Function", stewart:"2.8", week:2, day:"Tue Apr 21",
+      yt:"https://youtube.com/watch?v=62bkNYKbFME", ytLabel:"Professor Leonard", duration:"1:16:01",
+      hasViz:true, vizType:"derivative_def",
+      reading:[
+        "Replace the fixed number a with the variable x: f'(x) = lim(h->0) [f(x+h)-f(x)]/h. Now f' is a function, not just a number.",
+        "Notation: f'(x), y', dy/dx, d/dx[f(x)], D_x[f(x)] all mean the same thing.",
+        "f is differentiable at a if f'(a) exists. Differentiable on (a,b) means differentiable at every point in the interval.",
+        "THEOREM: if f is differentiable at a, then f is continuous at a. But continuous does NOT imply differentiable.",
+        "Three ways f can fail to be differentiable: (1) discontinuity, (2) sharp corner/cusp, (3) vertical tangent line.",
+        "Higher-order derivatives: f''(x) = (f')'(x) = d^2y/dx^2. If s(t) is position, then v(t) = s'(t) is velocity and a(t) = v'(t) = s''(t) is acceleration."
+      ],
+      practice:[
+        {q:"Find f'(x) using the definition for f(x) = mx + b.",a:"lim(h->0) [m(x+h)+b-(mx+b)]/h = lim mh/h = m"},
+        {q:"Find f'(x) for f(x) = 4 + 8x - 5x^2 using the definition.",a:"lim(h->0) [(4+8(x+h)-5(x+h)^2)-(4+8x-5x^2)]/h = lim [8h-10xh-5h^2]/h = 8-10x"},
+        {q:"Find f'(x) for f(x) = x^4 using the definition.",a:"lim(h->0) [(x+h)^4-x^4]/h. Expand, cancel x^4, factor h: f'(x) = 4x^3"},
+        {q:"Find g'(x) for g(x) = 1/(1+sqrt(x)).",a:"Use definition with rationalizing. g'(x) = -1/[2*sqrt(x)*(1+sqrt(x))^2]"},
+        {q:"Is |x| differentiable at x=0? Why?",a:"No. The graph has a sharp corner at x=0. Left slope = -1, right slope = +1."},
+        {q:"If f(x) = x^3 - 3x, find f'(x) and f''(x).",a:"f'(x) = 3x^2 - 3. f''(x) = 6x."}
+      ] },
   ]},
   // Week 2: Apr 20-23 | Week 3: Apr 27-30 | Week 4: May 4-7 (Exam 2) | Chapter 3
   { id:"ch3a", title:"Ch 3: Derivatives (Part 1)", exam:"Exam #2 — May 7", lectures:[
     { id:"2.7", title:"Derivatives and Rates of Change", stewart:"2.7", week:2, day:"Mon Apr 20",
       yt:"https://youtube.com/watch?v=tEVJNIhWNEg", ytLabel:"Professor Leonard", duration:"1:50:43",
       hasViz:true, vizType:"derivative_def",
-      reading:["The derivative f\'(a) = lim(h->0) [f(a+h)-f(a)]/h. This is the slope of the tangent line at x=a.","Equivalent form: f\'(a) = lim(x->a) [f(x)-f(a)]/(x-a).","The derivative gives the instantaneous rate of change of f at a."],
-      practice:[{q:"Find f\'(2) using definition for f(x) = x^2.",a:"lim(h->0) [(2+h)^2 - 4]/h = lim(h->0) (4h+h^2)/h = 4"},{q:"What does f\'(a) represent?",a:"Slope of tangent line at x=a, or instantaneous rate of change"}] },
+      reading:[
+        "The derivative of f at a, written f'(a), is the slope of the tangent line to y=f(x) at x=a.",
+        "Definition 1: f'(a) = lim(x->a) [f(x)-f(a)]/(x-a). Definition 2: f'(a) = lim(h->0) [f(a+h)-f(a)]/h. Both are equivalent.",
+        "The tangent line to y=f(x) at (a, f(a)): y - f(a) = f'(a)(x - a).",
+        "Average rate of change over [x1,x2] = [f(x2)-f(x1)]/(x2-x1) = slope of secant. Instantaneous rate = f'(a) = slope of tangent.",
+        "If s(t) is position, v(a) = s'(a) = lim(h->0) [s(a+h)-s(a)]/h. Acceleration a(t) = v'(t) = s''(t)."
+      ],
+      practice:[
+        {q:"Find slope of tangent to y=x^3+1 at (1,2) using Def 1.",a:"lim(x->1) (x^3+1-2)/(x-1) = lim (x^3-1)/(x-1) = lim (x^2+x+1) = 3"},
+        {q:"Find tangent line to y=x^2-2x^3 at (1,-1).",a:"f'(1) = -4. Line: y+1 = -4(x-1), so y = -4x+3"},
+        {q:"y = sqrt(1-3x). Find tangent line at (-1,2).",a:"m = lim(h->0) [sqrt(4-3h)-2]/h. Rationalize: -3/4. Line: y-2 = (-3/4)(x+1)"},
+        {q:"Rock on Mars: H = 10t-1.86t^2. Find v(2).",a:"v(a) = 10-3.72a. v(2) = 10-7.44 = 2.56 m/s"},
+        {q:"If g(5) = -3 and g'(5) = 4, find the tangent line at x=5.",a:"y-(-3) = 4(x-5). y = 4x-23"},
+        {q:"If g(x)=x^4-2, find g'(1) and use it for tangent line at (1,-1).",a:"g'(1) = lim(h->0) [(1+h)^4-2-(-1)]/h = 4. Line: y+1=4(x-1)"}
+      ] },
     { id:"2.8", title:"The Derivative as a Function", stewart:"2.8", week:2, day:"Tue Apr 21",
       yt:"https://youtube.com/watch?v=62bkNYKbFME", ytLabel:"Professor Leonard", duration:"1:16:01",
       hasViz:true, vizType:"derivative_def",
-      reading:["f\'(x) = lim(h->0) [f(x+h)-f(x)]/h gives the derivative as a function of x (not just at one point).","Notation: f\'(x), dy/dx, y\', df/dx all mean the same thing.","A function is differentiable at a if f\'(a) exists. Differentiable implies continuous, but not vice versa.","Not differentiable at: corners, cusps, vertical tangents, or discontinuities."],
-      practice:[{q:"Find f\'(x) from definition for f(x) = 3x+1.",a:"lim(h->0) [3(x+h)+1-(3x+1)]/h = lim 3h/h = 3"},{q:"Is |x| differentiable at x=0?",a:"No. Corner/sharp point at x=0."}] },
+      reading:[
+        "f'(x) = lim(h->0) [f(x+h)-f(x)]/h gives the derivative as a function of x (not just at one point).",
+        "Notation: f'(x), y', dy/dx, d/dx[f(x)], D_x[f(x)] all mean the same thing.",
+        "f is differentiable at a if f'(a) exists. Differentiable on (a,b) if differentiable at every point in the interval.",
+        "THEOREM: Differentiable at a implies continuous at a. But continuous does NOT imply differentiable (example: |x| at x=0).",
+        "Three ways f fails to be differentiable: (1) discontinuity, (2) sharp corner/cusp, (3) vertical tangent line.",
+        "Higher derivatives: f''(x) is the derivative of f'(x). If s(t) is position, v(t)=s'(t) is velocity, a(t)=s''(t) is acceleration."
+      ],
+      practice:[
+        {q:"Find f'(x) for f(x) = mx + b using the definition.",a:"lim(h->0) [m(x+h)+b-mx-b]/h = lim mh/h = m"},
+        {q:"Find f'(x) for f(x) = 4+8x-5x^2 using the definition.",a:"lim(h->0) [8h-10xh-5h^2]/h = 8-10x"},
+        {q:"Find f'(x) for F(t) = t^3-5t+1.",a:"lim(h->0) [(x+h)^3-5(x+h)+1-(x^3-5x+1)]/h = 3x^2-5"},
+        {q:"Find f'(x) for F(v) = v/(v+2) using definition.",a:"lim(h->0) [(x+h)/(x+h+2) - x/(x+2)]/h = 2/(x+2)^2"},
+        {q:"Is |x| differentiable at x=0?",a:"No. Sharp corner. Left derivative = -1, right derivative = +1. They disagree."},
+        {q:"f(x) = x^3-3x. Find f'(x) and f''(x).",a:"f'(x) = 3x^2-3. f''(x) = 6x."}
+      ] },
     { id:"3.1", title:"Derivatives of Polynomials and Exponential Functions", stewart:"3.1", week:2, day:"Wed Apr 22",
       yt:"https://youtube.com/watch?v=t3HjMCJNwCE", ytLabel:"Professor Leonard", duration:"1:12:31",
       hasViz:true, vizType:"diff_rules",
